@@ -5,13 +5,16 @@ var TEMPLATE_COMPLETE = 'KA01TP2605150533203936iNKdKqNSyV';
 function getSettings() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var s = ss.getSheetByName('설정');
-  var data = s.getRange(1, 1, 5, 2).getValues();
+  var data = s.getRange(1, 1, 6, 2).getValues();
   return {
-    active:      String(data[0][1]).trim(),
-    startDate:   data[1][1] ? new Date(data[1][1]) : null,
-    endDate:     data[2][1] ? new Date(data[2][1]) : null,
-    maxCount:    data[3][1] ? parseInt(data[3][1]) : null,
-    keywordDays: data[4][1] ? parseInt(data[4][1]) : 90
+    active:       String(data[0][1]).trim(),
+    startDate:    data[1][1] ? new Date(data[1][1]) : null,
+    endDate:      data[2][1] ? new Date(data[2][1]) : null,
+    maxCount:     data[3][1] ? parseInt(data[3][1]) : null,
+    keywordDays:  data[4][1] ? parseInt(data[4][1]) : 90,
+    notifyEmails: data[5]
+      ? String(data[5][1] || '').split(/[,\s]+/).filter(function(x){ return x; }).join(',')
+      : ''
   };
 }
 
@@ -321,24 +324,32 @@ function onSheetEdit(e) {
       }
     }
 
-    // 팀원에게 결제완료 알림메일 발송
+    // 팀원에게 결제완료 알림메일 발송 (수신자: 설정 시트 6행)
     try {
-      var rowData = sheet.getRange(row, 1, 1, 5).getValues()[0];
-      var name = String(rowData[2] || '');
-      var phone = String(rowData[3] || '');
-      var url = String(rowData[4] || '');
-      var subject = '[고방 블로그] 결제완료 — ' + name;
-      var body = [
-        '결제가 완료됐어요.',
-        '',
-        '신청자: ' + name,
-        '전화번호: ' + phone,
-        '지점 URL: ' + url,
-        'D-day: ' + Utilities.formatDate(dDay, 'Asia/Seoul', 'yyyy-MM-dd'),
-        '',
-        '▶ 신청 내역 확인: https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID,
-      ].join('\n');
-      MailApp.sendEmail('phwansik@neoflat.net, archoit94@neoflat.net', subject, body);
+      var notifyTo = getSettings().notifyEmails;
+      if (notifyTo) {
+        var rowData = sheet.getRange(row, 1, 1, 14).getValues()[0];
+        var name = String(rowData[2] || '');
+        var phone = String(rowData[3] || '');
+        var url = String(rowData[4] || '');
+        var subject = '[고방 블로그] 결제완료 — ' + name;
+        var body = [
+          '결제가 완료됐어요.',
+          '',
+          '결제완료일: ' + Utilities.formatDate(new Date(paymentDate), 'Asia/Seoul', 'yyyy-MM-dd'),
+          '신청자: ' + name,
+          '전화번호: ' + phone,
+          '지점 URL: ' + url,
+          '키워드1: ' + String(rowData[5] || ''),
+          '키워드2: ' + String(rowData[6] || ''),
+          '키워드3: ' + String(rowData[7] || ''),
+          '강조 내용: ' + String(rowData[8] || ''),
+          '작성 타입: ' + (String(rowData[12] || 'A')) + '타입',
+          '',
+          '▶ 신청 내역 확인: https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID,
+        ].join('\n');
+        MailApp.sendEmail(notifyTo, subject, body);
+      }
     } catch(mailErr) {}
   }
 
