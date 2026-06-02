@@ -243,6 +243,25 @@ function getSolapiAuthHeader() {
   return 'HMAC-SHA256 apiKey=' + apiKey + ', date=' + date + ', salt=' + salt + ', signature=' + signature;
 }
 
+// [신청 내역] 시트에서 지점 URL로 행 찾아 주황색으로 표시
+function highlightRequestRowByUrl(ss, targetUrl) {
+  if (!targetUrl || targetUrl.trim() === '') return;
+  var requestSheet = ss.getSheetByName('신청 내역');
+  if (!requestSheet) return;
+  var lastRow = requestSheet.getLastRow();
+  if (lastRow < 2) return;
+  var data = requestSheet.getRange(2, 5, lastRow - 1, 1).getValues();
+  var normalizedTarget = String(targetUrl).trim().toLowerCase();
+  for (var i = 0; i < data.length; i++) {
+    var rowUrl = String(data[i][0]).trim().toLowerCase();
+    if (rowUrl === normalizedTarget) {
+      var range = requestSheet.getRange(i + 2, 1, 1, requestSheet.getLastColumn());
+      range.setBackground('#ff9900');
+      return;
+    }
+  }
+}
+
 // 알림톡 발송
 function sendAlimtalk(to, templateId, variables) {
   var pfId    = PropertiesService.getScriptProperties().getProperty('SOLAPI_PF_ID');
@@ -281,7 +300,7 @@ function onSheetEdit(e) {
   var col       = e.range.getColumn();
   var row       = e.range.getRow();
 
-  // 신청 내역 B열(결제완료일) → 완료 내역 A열(D-day) 자동 계산
+  // 신청 내역 B열(결제완료일) → 완료 내역 A열(D-day) 자동 계산 + 팀원 알림메일
   if (sheetName === '신청 내역' && col === 2 && row >= 2) {
     var paymentDate = e.range.getValue();
     if (!paymentDate) return;
@@ -301,9 +320,29 @@ function onSheetEdit(e) {
         break;
       }
     }
+
+    // 팀원에게 결제완료 알림메일 발송
+    try {
+      var rowData = sheet.getRange(row, 1, 1, 5).getValues()[0];
+      var name = String(rowData[2] || '');
+      var phone = String(rowData[3] || '');
+      var url = String(rowData[4] || '');
+      var subject = '[고방 블로그] 결제완료 — ' + name;
+      var body = [
+        '결제가 완료됐어요.',
+        '',
+        '신청자: ' + name,
+        '전화번호: ' + phone,
+        '지점 URL: ' + url,
+        'D-day: ' + Utilities.formatDate(dDay, 'Asia/Seoul', 'yyyy-MM-dd'),
+        '',
+        '▶ 신청 내역 확인: https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID,
+      ].join('\n');
+      MailApp.sendEmail('phwansik@neoflat.net, archoit94@neoflat.net', subject, body);
+    } catch(mailErr) {}
   }
 
-  // 완료 내역 H열(발송 드롭박스) → 작업완료 알림톡 발송
+  // 완료 내역 H열(발송 드롭박스) → 작업완료 알림톡 발송 + [신청 내역] 주황색 표시
   if (sheetName === '완료 내역' && col === 8 && row >= 2) {
     var currentValue = String(e.range.getValue()).trim();
     if (currentValue !== '발송하기') return;
@@ -335,6 +374,7 @@ function onSheetEdit(e) {
       });
       sheet.getRange(row, 9).setValue(Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'));
       sheet.getRange(row, 8).setValue('발송완료');
+      highlightRequestRowByUrl(e.source, placeUrl2);
     } catch(err) {
       Logger.log('작업완료 알림톡 실패: ' + err);
       e.range.setValue('발송대기');
