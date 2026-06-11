@@ -12,7 +12,7 @@
 | 대상 | URL | 방법 |
 |------|-----|------|
 | 신청 폼 | https://gobangmkt.github.io/blog_request/ | GitHub Pages (main 브랜치 push 시 자동) |
-| 랜딩페이지 | https://landing-nf1.vercel.app | Vercel (`landing/` 폴더 기준) |
+| 랜딩페이지 | https://landing-two-tau-94.vercel.app | Vercel (`landing/` 폴더 기준) |
 
 - **랜딩 재배포**: `cd landing && npx vercel --prod`
 - **신청 폼 배포**: `git push origin main` 하면 자동 반영 (수 분 소요)

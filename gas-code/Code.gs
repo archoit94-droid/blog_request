@@ -18,6 +18,31 @@ function getSettings() {
   };
 }
 
+// [신청 내역] 시트에서 신청 기간(startDate~endDate) 내 신청 건수만 카운트.
+// A열 = 신청 일시. 기간 미설정 시에는 전체 건수(기존 동작) 반환.
+function countApplicationsInPeriod(cfg) {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName('신청 내역');
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return 0;
+
+  var periodStart = null, periodEnd = null;
+  if (cfg.startDate) { periodStart = new Date(cfg.startDate); periodStart.setHours(0, 0, 0, 0); }
+  if (cfg.endDate)   { periodEnd   = new Date(cfg.endDate);   periodEnd.setHours(23, 59, 59, 999); }
+  if (!periodStart && !periodEnd) return Math.max(0, lastRow - 1);
+
+  var dates = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  var count = 0;
+  for (var i = 0; i < dates.length; i++) {
+    if (!dates[i][0]) continue;
+    var rowDate = new Date(dates[i][0]);
+    if (periodStart && rowDate < periodStart) continue;
+    if (periodEnd   && rowDate > periodEnd)   continue;
+    count++;
+  }
+  return count;
+}
+
 function checkAccess() {
   var cfg = getSettings();
   var now = new Date();
@@ -38,9 +63,7 @@ function checkAccess() {
   }
 
   if (cfg.maxCount !== null) {
-    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    var sheet = ss.getSheetByName('신청 내역');
-    var count = Math.max(0, sheet.getLastRow() - 1);
+    var count = countApplicationsInPeriod(cfg);
     if (count >= cfg.maxCount) return { ok: false, reason: '신청 인원이 마감되었어요' };
   }
 
@@ -61,9 +84,7 @@ function doPost(e) {
     if (action === 'checkAccess') {
       var access = checkAccess();
       var cfg = getSettings();
-      var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-      var sheet = ss.getSheetByName('신청 내역');
-      var currentCount = Math.max(0, sheet.getLastRow() - 1);
+      var currentCount = countApplicationsInPeriod(cfg);
       result = {
         ok: access.ok,
         reason: access.reason || '',
