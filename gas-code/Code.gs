@@ -520,6 +520,7 @@ function listRequests(token) {
     var data = sheet.getRange(2, 1, lastRow - 1, 14).getValues();
     for (var i = 0; i < data.length; i++) {
       var r = data[i];
+      if (!String(r[3] || '').trim()) continue; // 전화번호(D) 빈 행=공지 등 → 제외
       var paidVal = r[1]; // B 결제완료일
       items.push({
         row: i + 2,
