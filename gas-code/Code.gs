@@ -101,6 +101,12 @@ function doPost(e) {
       result = checkPlaceUrl(payload.url);
     } else if (action === 'submitForm') {
       result = submitForm(payload);
+    } else if (action === 'listRequests') {
+      result = listRequests(payload.token);
+    } else if (action === 'sendPaymentLink') {
+      result = sendPaymentLink(payload.token, payload.row);
+    } else if (action === 'setPaymentDate') {
+      result = setPaymentDate(payload.token, payload.row, payload.date);
     } else {
       result = { error: 'Unknown action: ' + action };
     }
@@ -325,53 +331,11 @@ function onSheetEdit(e) {
   var row       = e.range.getRow();
 
   // 신청 내역 B열(결제완료일) → 완료 내역 A열(D-day) 자동 계산 + 팀원 알림메일
+  // (CS앱 setPaymentDate와 공용 — applyBlogPaymentComplete_)
   if (sheetName === '신청 내역' && col === 2 && row >= 2) {
     var paymentDate = e.range.getValue();
     if (!paymentDate) return;
-    var dDay = new Date(paymentDate);
-    dDay.setDate(dDay.getDate() + 7);
-    var placeUrl = sheet.getRange(row, 5).getValue();
-    if (!placeUrl) return;
-    var doneSheet = e.source.getSheetByName('완료 내역');
-    if (!doneSheet) return;
-    var lastRow = doneSheet.getLastRow();
-    if (lastRow < 2) return;
-    var doneUrls = doneSheet.getRange(2, 4, lastRow - 1, 1).getValues();
-    var normalizedUrl = String(placeUrl).trim().toLowerCase();
-    for (var i = 0; i < doneUrls.length; i++) {
-      if (String(doneUrls[i][0]).trim().toLowerCase() === normalizedUrl) {
-        doneSheet.getRange(i + 2, 1).setValue(dDay);
-        break;
-      }
-    }
-
-    // 팀원에게 결제완료 알림메일 발송 (수신자: 설정 시트 6행)
-    try {
-      var notifyTo = getSettings().notifyEmails;
-      if (notifyTo) {
-        var rowData = sheet.getRange(row, 1, 1, 14).getValues()[0];
-        var name = String(rowData[2] || '');
-        var phone = String(rowData[3] || '');
-        var url = String(rowData[4] || '');
-        var subject = '[고방 블로그] 결제완료 — ' + name;
-        var body = [
-          '결제가 완료됐어요.',
-          '',
-          '결제완료일: ' + Utilities.formatDate(new Date(paymentDate), 'Asia/Seoul', 'yyyy-MM-dd'),
-          '신청자: ' + name,
-          '전화번호: ' + phone,
-          '지점 URL: ' + url,
-          '키워드1: ' + String(rowData[5] || ''),
-          '키워드2: ' + String(rowData[6] || ''),
-          '키워드3: ' + String(rowData[7] || ''),
-          '강조 내용: ' + String(rowData[8] || ''),
-          '작성 타입: ' + (String(rowData[12] || 'A')) + '타입',
-          '',
-          '▶ 신청 내역 확인: https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID,
-        ].join('\n');
-        MailApp.sendEmail(notifyTo, subject, body);
-      }
-    } catch(mailErr) {}
+    applyBlogPaymentComplete_(e.source, sheet, row, paymentDate);
   }
 
   // 완료 내역 H열(발송 드롭박스) → 작업완료 알림톡 발송 + [신청 내역] 주황색 표시
@@ -520,4 +484,153 @@ function cleanupH_Column() {
   }
 
   Logger.log('H열 정리 완료: FALSE 값을 "발송대기"로 변환');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CS 도움앱 — 신규 요청 인박스 중계 (listRequests / sendPaymentLink / setPaymentDate)
+   신청 내역(14열): A신청일시 B결제완료일 C신청자 D전화번호 E지점URL
+                    F키워드1 G키워드2 H키워드3 I강조 J보증금 K월세 L도보 M작성타입 N상태
+   공유 토큰(Script Property INBOX_TOKEN) 검증. 전화번호(D)는 응답에서 제외.
+═══════════════════════════════════════════════════════════ */
+
+function checkInboxToken_(token) {
+  var t = PropertiesService.getScriptProperties().getProperty('INBOX_TOKEN');
+  return !!t && token === t;
+}
+
+function fmtDateTime_(v) {
+  if (!v) return '';
+  if (v instanceof Date) return Utilities.formatDate(v, 'Asia/Seoul', 'yyyy-MM-dd HH:mm');
+  return String(v);
+}
+function fmtDate_(v) {
+  if (!v) return '';
+  if (v instanceof Date) return Utilities.formatDate(v, 'Asia/Seoul', 'yyyy-MM-dd');
+  return String(v);
+}
+
+// 신청 내역(14열) → 전화번호(D,4번째) 제외 목록. 결제완료일(B)로 paid 판정.
+function listRequests(token) {
+  if (!checkInboxToken_(token)) return { error: 'unauthorized' };
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName('신청 내역');
+  var lastRow = sheet.getLastRow();
+  var items = [];
+  if (lastRow >= 2) {
+    var data = sheet.getRange(2, 1, lastRow - 1, 14).getValues();
+    for (var i = 0; i < data.length; i++) {
+      var r = data[i];
+      var paidVal = r[1]; // B 결제완료일
+      items.push({
+        row: i + 2,
+        신청일시: fmtDateTime_(r[0]),
+        paid: !!paidVal,
+        paidDate: fmtDate_(paidVal),
+        paidDateISO: fmtDate_(paidVal),
+        신청자: String(r[2] || ''),
+        // 전화번호 r[3] 제외(PII)
+        지점URL: String(r[4] || ''),
+        키워드1: String(r[5] || ''),
+        키워드2: String(r[6] || ''),
+        키워드3: String(r[7] || ''),
+        강조내용: String(r[8] || ''),
+        작성타입: String(r[12] || ''),
+        상태: String(r[13] || '')
+      });
+    }
+  }
+  return { sheetUrl: 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID, items: items };
+}
+
+// 결제요청 알림톡 발송 + 상태(N,14)='결제링크발송'. 이미 발송 기록 있으면 가드.
+function sendPaymentLink(token, row) {
+  if (!checkInboxToken_(token)) return { error: 'unauthorized' };
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName('신청 내역');
+  if (row < 2 || row > sheet.getLastRow()) return { error: 'invalid_row' };
+
+  var rowData = sheet.getRange(row, 1, 1, 14).getValues()[0];
+  if (String(rowData[13] || '').indexOf('결제링크발송') >= 0) {
+    return { ok: true, already: true };
+  }
+  var phone = String(rowData[3] || '');
+  var name = String(rowData[2] || '');
+  if (!phone) return { error: 'no_phone' };
+  try {
+    sendAlimtalk(phone, TEMPLATE_PAYMENT, { '#{신청자}': name });
+    sheet.getRange(row, 14).setValue('결제링크발송');
+    return { ok: true };
+  } catch (e) {
+    return { error: String(e) };
+  }
+}
+
+// 결제완료일(B) 기입/취소. 프로그래밍 setValue는 onEdit 미발동 → 후속작업 직접 호출.
+function setPaymentDate(token, row, date) {
+  if (!checkInboxToken_(token)) return { error: 'unauthorized' };
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName('신청 내역');
+  if (row < 2 || row > sheet.getLastRow()) return { error: 'invalid_row' };
+
+  if (!date) {
+    sheet.getRange(row, 2).clearContent(); // 취소(clear) — 후속 알림 없음
+    return { ok: true };
+  }
+  var d = new Date(date); // 'yyyy-MM-dd'
+  sheet.getRange(row, 2).setValue(d);
+  try {
+    applyBlogPaymentComplete_(ss, sheet, row, d);
+  } catch (e) {
+    Logger.log('결제완료 후속작업 실패: ' + e);
+  }
+  return { ok: true };
+}
+
+// onSheetEdit 신청내역 B열 로직과 공용: 완료내역 D-day 갱신 + 팀원 알림메일.
+function applyBlogPaymentComplete_(ss, sheet, row, paymentDate) {
+  var dDay = new Date(paymentDate);
+  dDay.setDate(dDay.getDate() + 7);
+  var placeUrl = sheet.getRange(row, 5).getValue();
+  if (placeUrl) {
+    var doneSheet = ss.getSheetByName('완료 내역');
+    if (doneSheet) {
+      var lastRow = doneSheet.getLastRow();
+      if (lastRow >= 2) {
+        var doneUrls = doneSheet.getRange(2, 4, lastRow - 1, 1).getValues();
+        var normalizedUrl = String(placeUrl).trim().toLowerCase();
+        for (var i = 0; i < doneUrls.length; i++) {
+          if (String(doneUrls[i][0]).trim().toLowerCase() === normalizedUrl) {
+            doneSheet.getRange(i + 2, 1).setValue(dDay);
+            break;
+          }
+        }
+      }
+    }
+  }
+  try {
+    var notifyTo = getSettings().notifyEmails;
+    if (notifyTo) {
+      var rowData = sheet.getRange(row, 1, 1, 14).getValues()[0];
+      var name = String(rowData[2] || '');
+      var phone = String(rowData[3] || '');
+      var url = String(rowData[4] || '');
+      var subject = '[고방 블로그] 결제완료 — ' + name;
+      var body = [
+        '결제가 완료됐어요.',
+        '',
+        '결제완료일: ' + Utilities.formatDate(new Date(paymentDate), 'Asia/Seoul', 'yyyy-MM-dd'),
+        '신청자: ' + name,
+        '전화번호: ' + phone,
+        '지점 URL: ' + url,
+        '키워드1: ' + String(rowData[5] || ''),
+        '키워드2: ' + String(rowData[6] || ''),
+        '키워드3: ' + String(rowData[7] || ''),
+        '강조 내용: ' + String(rowData[8] || ''),
+        '작성 타입: ' + (String(rowData[12] || 'A')) + '타입',
+        '',
+        '▶ 신청 내역 확인: https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID,
+      ].join('\n');
+      MailApp.sendEmail(notifyTo, subject, body);
+    }
+  } catch (mailErr) {}
 }
