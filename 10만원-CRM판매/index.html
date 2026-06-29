@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>기존 고객 한정 — 블로그 작성 10만원 이벤트</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { width: 100%; }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F2F4F6;
+      min-height: 100vh;
+      width: 100%;
+      overflow-x: hidden;
+      padding-top: 48px; /* 카운트다운 배너 높이 */
+    }
+
+    /* ── 카운트다운 고정 배너 ── */
+    #countdown-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: #B91C1C;
+      color: #fff;
+      text-align: center;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.3;
+    }
+    #countdown-bar .dday {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    #countdown-bar .sub {
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.85;
+      margin-left: 6px;
+    }
+
+    /* ── 히어로 섹션 ── */
+    .hero {
+      background: #0A1628;
+      padding: 36px 24px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; left: 50%; transform: translateX(-50%);
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(43,133,204,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245,184,0,0.15);
+      border: 1px solid rgba(245,184,0,0.4);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #F5B800;
+      margin-bottom: 18px;
+    }
+    .hero-badge::before {
+      content: '🔒';
+      font-size: 11px;
+    }
+    .hero-discount {
+      font-size: 42px;
+      font-weight: 800;
+      color: #F5B800;
+      line-height: 1;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+    .hero-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.35;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+    .hero-price-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 18px 0 6px;
+    }
+    .hero-origin {
+      font-size: 16px;
+      color: rgba(255,255,255,0.35);
+      text-decoration: line-through;
+      font-weight: 500;
+    }
+    .hero-price {
+      font-size: 36px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+    .hero-price-note {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 24px;
+    }
+    .hero-cta {
+      display: block;
+      max-width: 320px;
+      margin: 0 auto;
+      padding: 16px;
+      background: #2B85CC;
+      color: #fff;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .hero-cta:hover { background: #1E6DB0; }
+    .hero-cta .cta-sub {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      opacity: 0.8;
+      margin-top: 3px;
+    }
+
+    /* ── 혜택 섹션 ── */
+    .benefits {
+      background: #fff;
+      margin: 8px 0;
+      padding: 20px 20px 20px;
+    }
+    .benefits-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #8B95A1;
+      margin-bottom: 14px;
+      letter-spacing: 0.3px;
+    }
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #F8FAFF;
+      border: 1.5px solid #A4CCE8;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+    .benefit-item:last-child { margin-bottom: 0; }
+    .benefit-icon {
+      width: 24px; height: 24px;
+      background: #2B85CC;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px;
+      color: #fff;
+      font-weight: 700;
+    }
+    .benefit-text {
+      font-size: 14px;
+      color: #191F28;
+      line-height: 1.55;
+      font-weight: 500;
+    }
+    .benefit-text strong { color: #0A1628; }
+
+    /* ── 폼 영역 (v2 동일) ── */
+    .header {
+      background: #fff;
+      padding: 20px 20px 0;
+      border-bottom: 1px solid #F2F4F6;
+    }
+    .header-inner { max-width: 480px; margin: 0 auto; padding-bottom: 20px; }
+    .header-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .header-logo img { height: 28px; }
+    .header-logo-text { font-size: 14px; font-weight: 700; color: #191F28; }
+    .header h1 { font-size: 20px; font-weight: 700; color: #191F28; line-height: 1.4; }
+    .header p { font-size: 14px; color: #8B95A1; margin-top: 4px; }
+
+    .status-banner {
+      background: #fff; padding: 14px 20px;
+      border-bottom: 1px solid #F2F4F6;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .status-banner-inner { max-width: 480px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 6px; }
+    .status-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .status-label { font-size: 13px; color: #8B95A1; }
+    .status-value { font-size: 14px; font-weight: 700; color: #191F28; text-align: right; }
+    .status-urgent-msg {
+      font-size: 14px; font-weight: 600; color: #D92B2B;
+      background: #FFF0F2;
+      border-radius: 8px; padding: 10px 14px;
+      line-height: 1.5;
+    }
+
+    .notice-card {
+      background: #F8FAFF;
+      border: 1.5px solid #A4CCE8;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 8px;
+    }
+    .notice-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .notice-card li {
+      font-size: 14px; color: #4A5568; line-height: 1.6;
+      padding-left: 16px; position: relative;
+    }
+    .notice-card li::before { content: '·'; position: absolute; left: 4px; color: #2B85CC; font-weight: 700; }
+    .notice-card a { color: #2B85CC; text-decoration: underline; }
+
+    .page { max-width: 480px; margin: 0 auto; padding: 0 0 90px; }
+    .section { background: #fff; margin-top: 8px; padding: 20px 20px 16px; }
+    .section-title { font-size: 13px; font-weight: 600; color: #8B95A1; margin-bottom: 16px; letter-spacing: 0.3px; }
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label { font-size: 14px; font-weight: 600; color: #191F28; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+
+    input, textarea {
+      width: 100%; padding: 14px 16px;
+      border: 1.5px solid #E5E8EB; border-radius: 10px;
+      font-size: 15px; font-family: inherit; color: #191F28;
+      background: #fff; outline: none;
+      transition: border-color 0.15s; -webkit-appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: #B0B8C1; }
+    input:focus, textarea:focus { border-color: #2B85CC; }
+    input.valid { border-color: #00C73C; }
+    input.invalid { border-color: #F04452; }
+    textarea { resize: none; height: 100px; line-height: 1.6; }
+
+    .feedback { font-size: 12px; margin-top: 6px; min-height: 16px; display: flex; align-items: center; gap: 4px; }
+    .feedback.ok { color: #00C73C; }
+    .feedback.error { color: #F04452; }
+    .feedback.checking { color: #8B95A1; }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .place-preview { display: none; margin-top: 12px; border: 1.5px solid #E5E8EB; border-radius: 10px; overflow: hidden; }
+    .preview-skeleton { display: none; align-items: center; justify-content: center; height: 60px; gap: 8px; color: #8B95A1; font-size: 13px; }
+    .place-preview.loading .preview-skeleton { display: flex; }
+    .spinner { width: 16px; height: 16px; border: 2px solid #E5E8EB; border-top-color: #2B85CC; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .og-card { display: none; text-decoration: none; color: inherit; }
+    .place-preview.loaded .og-card { display: flex; }
+    .og-image { width: 90px; min-height: 90px; background: #F2F4F6; flex-shrink: 0; overflow: hidden; }
+    .og-image img { width: 100%; height: 100%; object-fit: cover; }
+    .og-body { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+    .og-host { font-size: 11px; color: #B0B8C1; }
+    .og-title { font-size: 14px; font-weight: 600; color: #191F28; line-height: 1.4; }
+    .og-desc { font-size: 12px; color: #8B95A1; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .preview-info { display: none; padding: 14px 16px; background: #F8FAFF; border-top: 1px solid #E5E8EB; }
+    .place-preview.loaded .preview-info { display: block; }
+    .preview-info-title { font-size: 12px; font-weight: 600; color: #2B85CC; margin-bottom: 10px; }
+    .info-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .info-fields.single { grid-template-columns: 1fr; }
+    .info-field-label { font-size: 11px; font-weight: 600; color: #8B95A1; margin-bottom: 4px; }
+    .info-field input { padding: 10px 12px; font-size: 14px; border: 1.5px solid #E5E8EB; border-radius: 8px; background: #fff; }
+
+    .kw-item { display: flex; align-items: flex-start; gap: 12px; }
+    .kw-num { width: 28px; height: 28px; border-radius: 50%; background: #F2F4F6; color: #8B95A1; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 13px; }
+    .kw-num.active { background: #E8F2FA; color: #2B85CC; }
+    .kw-num.valid-num { background: #E8FBF0; color: #00C73C; }
+    .kw-num.invalid-num { background: #FFF0F2; color: #F04452; }
+    .kw-body { flex: 1; }
+
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px;
+      padding: 12px 20px 16px;
+      background: #fff; border-top: 1px solid #F2F4F6;
+    }
+    button[type="submit"] {
+      width: 100%; padding: 15px; background: #2B85CC; color: #fff;
+      border: none; border-radius: 10px; font-size: 16px; font-weight: 700;
+      font-family: inherit; cursor: pointer; transition: background 0.15s;
+    }
+    button[type="submit"]:hover:not(:disabled) { background: #1E6DB0; }
+    button[type="submit"]:disabled { background: #E5E8EB; color: #B0B8C1; cursor: not-allowed; }
+    .char-count { font-size: 12px; color: #B0B8C1; text-align: right; margin-top: 6px; }
+
+    .off-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 40px 20px; text-align: center; }
+    .off-icon { width: 56px; height: 56px; background: #F2F4F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
+    .off-screen h2 { font-size: 18px; font-weight: 700; color: #191F28; margin-bottom: 8px; }
+    .off-screen p { font-size: 14px; color: #8B95A1; line-height: 1.6; }
+
+    .success-screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; padding: 40px 20px; text-align: center; }
+    .success-icon { width: 64px; height: 64px; background: #E8F2FA; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 20px; }
+    .success-screen h2 { font-size: 20px; font-weight: 700; color: #191F28; margin-bottom: 10px; }
+    .success-screen p { font-size: 15px; color: #8B95A1; line-height: 1.7; }
+    .success-pay-btn {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 16px 32px;
+      background: #0A1628;
+      color: #F5B800;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .success-pay-btn:hover { background: #152238; }
+    .success-pay-note { font-size: 12px; color: #B0B8C1; margin-top: 10px; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: flex-end; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal-sheet { background: #fff; border-radius: 20px 20px 0 0; padding: 28px 24px 32px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.2s ease; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-icon { width: 48px; height: 48px; background: #F2F4F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px; }
+    .modal-title { font-size: 20px; font-weight: 700; color: #191F28; margin-bottom: 8px; }
+    .modal-desc { font-size: 15px; color: #8B95A1; line-height: 1.6; margin-bottom: 16px; }
+    .agree-row { display: flex; align-items: center; gap: 12px; cursor: pointer; background: #F8FAFF; border: 1.5px solid #A4CCE8; border-radius: 10px; padding: 14px 16px; }
+    .agree-text { font-size: 14px; color: #4A5568; line-height: 1.5; flex: 1; letter-spacing: -0.3px; word-break: keep-all; }
+    .agree-text strong { color: #191F28; }
+    .toggle-wrap { position: relative; width: 22px; height: 22px; flex-shrink: 0; margin-top: 1px; }
+    .toggle-input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-slider { position: absolute; inset: 0; background: #fff; border: 2px solid #C4CBD4; border-radius: 5px; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 5px; height: 10px; left: 6px; top: 2px; border-right: 2.5px solid transparent; border-bottom: 2.5px solid transparent; transform: rotate(45deg); transition: border-color 0.15s; }
+    .toggle-input:checked + .toggle-slider { background: #2B85CC; border-color: #2B85CC; }
+    .toggle-input:checked + .toggle-slider::before { border-color: #fff; }
+    .modal-summary { background: #F8FAFF; border: 1.5px solid #E5E8EB; border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .summary-row { display: flex; align-items: flex-start; gap: 8px; }
+    .summary-label { font-size: 13px; color: #8B95A1; font-weight: 500; min-width: 70px; flex-shrink: 0; }
+    .summary-value { font-size: 13px; color: #191F28; font-weight: 600; word-break: break-all; flex: 1; }
+    .modal-btns { display: flex; flex-direction: column; gap: 8px; }
+
+    .template-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .template-help-btn { font-size: 13px; color: #2B85CC; cursor: pointer; font-weight: 500; text-decoration: underline; flex-shrink: 0; }
+    .template-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .template-card { border: 2px solid #E5E8EB; border-radius: 12px; padding: 16px 14px; cursor: pointer; transition: border-color 0.15s, background 0.15s; background: #fff; }
+    .template-card.selected { border-color: #2B85CC; background: #E8F2FA; }
+    .template-type-tag { font-size: 11px; font-weight: 700; color: #2B85CC; background: #E8F2FA; border-radius: 6px; padding: 2px 8px; display: inline-block; margin-bottom: 8px; }
+    .template-card.selected .template-type-tag { background: #2B85CC; color: #fff; }
+    .template-card-title { font-size: 16px; font-weight: 700; color: #191F28; margin-bottom: 4px; }
+    .template-card-desc { font-size: 12px; color: #8B95A1; line-height: 1.5; }
+    .template-card-help { display: inline-block; font-size: 12px; color: #2B85CC; margin-top: 10px; cursor: pointer; text-decoration: underline; font-weight: 500; }
+    .template-example-link { margin-top: 12px; padding-top: 10px; border-top: 1px solid #E5E8EB; }
+    .template-example-link a { display: inline-block; font-size: 13px; font-weight: 600; color: #2B85CC; text-decoration: none; background: #E8F2FA; border-radius: 8px; padding: 6px 14px; }
+    .template-example-link a:hover { background: #D6E6FF; }
+    .template-desc-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .template-desc-item { border: 1.5px solid #E5E8EB; border-radius: 10px; overflow: hidden; }
+    .template-desc-head { background: #F8FAFF; padding: 12px 16px; font-size: 14px; font-weight: 700; color: #191F28; display: flex; align-items: center; gap: 8px; }
+    .template-desc-head-tag { font-size: 11px; font-weight: 700; color: #fff; background: #2B85CC; border-radius: 5px; padding: 2px 8px; }
+    .template-desc-body { padding: 12px 16px; font-size: 14px; color: #4A5568; line-height: 1.7; }
+    .btn-confirm { width: 100%; padding: 15px; background: #2B85CC; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; }
+    .btn-cancel { width: 100%; padding: 15px; background: #F2F4F6; color: #4E5968; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; font-family: inherit; cursor: pointer; }
+
+    @media screen and (max-width: 480px) {
+      .page, .header-inner, .status-banner-inner { max-width: 100%; margin-left: 0; margin-right: 0; }
+      .bottom-bar { left: 0; right: 0; transform: none; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- D-7 카운트다운 배너 (고정) -->
+<div id="countdown-bar"></div>
+
+<!-- 비활성화 화면 -->
+<div class="off-screen" id="offScreen" style="display:none;">
+  <div class="off-icon">🔒</div>
+  <h2>신청을 받지 않고 있어요</h2>
+  <p id="offReason"></p>
+</div>
+
+<!-- 메인 영역 -->
+<div id="form-area" style="display:none;">
+
+  <!-- 히어로 섹션 -->
+  <div class="hero">
+    <div class="hero-badge">기존 고객 전용 · 비공개 링크</div>
+    <div class="hero-discount">67% OFF</div>
+    <div class="hero-title">블로그 글 한 편을<br>지금 딱 이 가격에</div>
+    <div class="hero-price-row">
+      <span class="hero-origin">300,000원</span>
+      <span class="hero-price">100,000원</span>
+    </div>
+    <div class="hero-price-note">VAT 별도 · 일주일 한정</div>
+    <a href="#apply-form" class="hero-cta">
+      지금 신청하기
+      <span class="cta-sub">↓ 아래에서 바로 신청 가능해요</span>
+    </a>
+  </div>
+
+  <!-- 혜택 섹션 -->
+  <div class="benefits">
+    <div class="benefits-title">이벤트 혜택</div>
+    <div class="benefit-item">
+      <div class="benefit-icon">1</div>
+      <div class="benefit-text"><strong>기존 고객만</strong> 받는 특별가 — 정가 30만원에서 무려 <strong>67% 할인</strong></div>
+    </div>
+    <div class="benefit-item">
+      <div class="benefit-icon">2</div>
+      <div class="benefit-text">키워드 최대 3개, 고방 사진 자동 활용, <strong>영업일 7일 내</strong> 발행 보장</div>
+    </div>
+    <div class="benefit-item">
+      <div class="benefit-icon">3</div>
+      <div class="benefit-text"><strong>선착순 마감</strong> — 기간 내라도 모집 완료 시 조기 종료될 수 있어요</div>
+    </div>
+  </div>
+
+  <!-- 폼 헤더 -->
+  <div class="header" id="apply-form">
+    <div class="header-inner">
+      <div class="header-logo">
+        <img src="../15만원-여름특가/assets/U_ALF.png" alt="고방" onerror="this.style.display='none'">
+        <span class="header-logo-text">고방 블로그 마케팅</span>
+      </div>
+      <h1>블로그 작성 신청서</h1>
+      <p>키워드와 지점 정보를 입력해 주세요</p>
+    </div>
+  </div>
+
+  <div class="status-banner" id="statusBanner" style="display:none;">
+    <div class="status-banner-inner" id="statusBannerInner"></div>
+  </div>
+
+  <div class="page">
+    <div class="section" style="margin-top:8px;">
+      <div class="notice-card">
+        <ul>
+          <li>사진은 고방에 등록된 지점 사진만 사용됩니다. 사진 추가를 원하실 경우 <a href="https://u-ceo.kr/login" target="_blank">u-ceo.kr/login</a> 에서 로그인 후 지점 사진을 먼저 추가해 주세요.</li>
+          <li>신청 접수 후 <strong>결제 안내 알림톡</strong>이 발송되며, 결제 완료 후 <strong>영업일 7일 내</strong> 발행됩니다.</li>
+          <li>이벤트 특별가로 <strong>동일 지점 1회</strong>만 신청 가능합니다.</li>
+        </ul>
+      </div>
+    </div>
+
+    <form id="applyForm" novalidate>
+
+      <div class="section">
+        <div class="section-title">신청자 정보</div>
+        <div class="row">
+          <div class="field">
+            <div class="field-label">이름</div>
+            <input type="text" id="name" placeholder="홍길동" autocomplete="off">
+          </div>
+          <div class="field">
+            <div class="field-label">전화번호</div>
+            <input type="tel" id="phone" placeholder="010-0000-0000" autocomplete="off" maxlength="13">
+            <div class="feedback" id="fb-phone"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">지점 정보</div>
+        <div class="field">
+          <div class="field-label" style="display:flex;align-items:center;justify-content:space-between;">
+            지점 URL
+            <a href="https://gobang.kr" target="_blank" rel="noopener"
+               style="font-size:12px;font-weight:600;color:#2B85CC;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+              고방 바로가기 →
+            </a>
+          </div>
+          <input type="url" id="placeUrl" placeholder="https://gobang.kr/place/8102" autocomplete="off">
+          <div class="feedback" id="fb-url"></div>
+          <div style="font-size:12px;color:#B0B8C1;margin-top:6px;">동일한 지점 URL로는 신청 기간 내 1회만 신청 가능합니다.</div>
+          <div class="place-preview" id="placePreview">
+            <div class="preview-skeleton">
+              <div class="spinner"></div>
+              지점 정보 불러오는 중...
+            </div>
+            <a class="og-card" id="ogCard" target="_blank" rel="noopener">
+              <div class="og-image" id="ogImageWrap"></div>
+              <div class="og-body">
+                <div class="og-host">gobang.kr</div>
+                <div class="og-title" id="ogTitle"></div>
+                <div class="og-desc" id="ogDesc"></div>
+              </div>
+            </a>
+            <div class="preview-info" id="previewInfo">
+              <div class="preview-info-title">✦ 지점 정보 (사실과 다를 경우 직접 수정해 주세요)</div>
+              <div class="info-fields">
+                <div class="info-field">
+                  <div class="info-field-label">보증금</div>
+                  <input type="text" id="deposit" placeholder="예: 50만원">
+                </div>
+                <div class="info-field">
+                  <div class="info-field-label">월세</div>
+                  <input type="text" id="monthly" placeholder="예: 40만원">
+                </div>
+              </div>
+              <div class="info-fields single" style="margin-top:10px;">
+                <div class="info-field">
+                  <div class="info-field-label">도보 정보</div>
+                  <input type="text" id="walking" placeholder="예: 강남역 도보 5분">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">키워드 · 최소 1개, 최대 3개</div>
+        <div style="background:#F8FAFF;border:1.5px solid #A4CCE8;border-radius:8px;padding:12px 14px;margin-bottom:14px;">
+          <div style="font-size:14px;color:#4A5568;line-height:1.6;">· 띄어쓰기는 무시됩니다. <span style="color:#8B95A1;">(예: '마포구고시원' = '마포구 고시원')</span></div>
+        </div>
+        <div class="field">
+          <div class="kw-item">
+            <div class="kw-num" id="kw-num-kw1">1</div>
+            <div class="kw-body">
+              <input type="text" id="kw1" placeholder="예: 마포구고시원" autocomplete="off">
+              <div class="feedback" id="fb-kw1"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="kw-item">
+            <div class="kw-num" id="kw-num-kw2">2</div>
+            <div class="kw-body">
+              <input type="text" id="kw2" placeholder="선택 사항" autocomplete="off">
+              <div class="feedback" id="fb-kw2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="kw-item">
+            <div class="kw-num" id="kw-num-kw3">3</div>
+            <div class="kw-body">
+              <input type="text" id="kw3" placeholder="선택 사항" autocomplete="off">
+              <div class="feedback" id="fb-kw3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">작성 템플릿</div>
+        <div class="template-cards">
+          <div class="template-card selected" data-type="A" id="card-A">
+            <div class="template-type-tag">A타입</div>
+            <div class="template-card-title">설명형</div>
+            <div class="template-card-desc">지점의 특징과<br>환경을 상세 설명</div>
+            <span class="template-card-help" data-type="A">항목 설명 보기</span>
+          </div>
+          <div class="template-card" data-type="B" id="card-B">
+            <div class="template-type-tag">B타입</div>
+            <div class="template-card-title">후기형</div>
+            <div class="template-card-desc">실제 경험을<br>바탕으로 한 후기</div>
+            <span class="template-card-help" data-type="B">항목 설명 보기</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">추가 정보</div>
+        <div class="field">
+          <div class="field-label">강조하고 싶은 내용</div>
+          <textarea id="description" placeholder="주차 가능, 조용한 분위기, 24시간 운영 등 강조할 내용을 적어주세요." maxlength="300"></textarea>
+          <div class="char-count"><span id="charCount">0</span>/300</div>
+        </div>
+      </div>
+
+      <div class="section" style="display:flex;flex-direction:column;gap:10px;">
+        <label class="agree-row" for="agreeToggle">
+          <div class="toggle-wrap">
+            <input type="checkbox" id="agreeToggle" class="toggle-input">
+            <span class="toggle-slider"></span>
+          </div>
+          <span class="agree-text">입력하신 키워드로 <strong>네이버 블로그 탭 상단 노출</strong>을 목표로 작성되며, 알고리즘 특성상 <strong>노출 순위 및 유지 기간은 변동</strong>될 수 있음을 이해했습니다.</span>
+        </label>
+        <label class="agree-row" for="agreeToggle2">
+          <div class="toggle-wrap">
+            <input type="checkbox" id="agreeToggle2" class="toggle-input">
+            <span class="toggle-slider"></span>
+          </div>
+          <span class="agree-text">신청 접수 후 <strong>결제 안내 알림톡</strong>이 발송되며, <strong>결제가 완료되어야 작업이 시작</strong>됩니다.</span>
+        </label>
+      </div>
+
+      <div style="height: 20px;"></div>
+
+      <div class="bottom-bar">
+        <button type="submit" id="submitBtn" disabled>신청 접수하기</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- 템플릿 모달 -->
+<div class="modal-overlay" id="templateModal">
+  <div class="modal-sheet">
+    <div class="modal-title">템플릿 유형 안내</div>
+    <div class="modal-desc" style="margin-bottom:16px;">블로그 작성 방식을 선택해 주세요</div>
+    <div class="template-desc-list">
+      <div class="template-desc-item" id="desc-item-A">
+        <div class="template-desc-head">
+          <span class="template-desc-head-tag">A타입</span>설명형
+        </div>
+        <div class="template-desc-body">
+          <strong>객관적인 어투 + 정보전달 중심</strong>으로, 이 지점이 <strong>왜 좋은지 / 주변 지점 대비 뭐가 강점인지</strong>를 근거 있게 정리해요.<br><br>
+          가격·입실조건·시설·위치·주변 편의시설처럼 <strong>비교 포인트를 구조화</strong>해서, 처음 보는 사람도 한 번에 이해하게 만드는 "정보 정리형"이에요.
+          <div class="template-example-link">
+            <a href="https://blog.naver.com/neoflat1116/224260067840" target="_blank" rel="noopener">예시 글 보기 →</a>
+          </div>
+        </div>
+      </div>
+      <div class="template-desc-item" id="desc-item-B">
+        <div class="template-desc-head">
+          <span class="template-desc-head-tag">B타입</span>후기형
+        </div>
+        <div class="template-desc-body">
+          <strong>살았을 때의 느낌을 간접 체험</strong>하게, "후기형"으로 자연스럽게 풀어줘요.<br><br>
+          입실한 것처럼 <strong>동선·분위기·생활 체감 포인트</strong>를 디테일하게 묘사해서, 읽는 사람이 <strong>어떤 생활을 하게 될지 감이 오게</strong> 만드는 스타일이에요.
+          <div class="template-example-link">
+            <a href="https://blog.naver.com/neoflat1116/224260216013" target="_blank" rel="noopener">예시 글 보기 →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="templateModalClose">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 최종 확인 모달 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-sheet">
+    <div class="modal-icon">📋</div>
+    <div class="modal-title">입력 내용 최종 확인</div>
+    <div class="modal-desc">신청 후에는 내용을 수정할 수 없어요.<br>아래 내용이 맞는지 확인해 주세요.</div>
+    <div class="modal-summary" id="modalSummary"></div>
+    <div style="border:1.5px solid #E5E8EB;border-radius:10px;margin-bottom:16px;">
+      <div style="background:#F8FAFF;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-radius:10px 10px 0 0;" id="privacyToggleHeader">
+        <span style="font-size:13px;font-weight:600;color:#191F28;">개인정보 수집 및 이용 동의 <span style="color:#F04452;">*필수</span></span>
+        <span style="font-size:11px;color:#8B95A1;" id="privacyArrow">▶ 내용 보기</span>
+      </div>
+      <div style="display:none;padding:12px 14px;font-size:12px;color:#4A5568;line-height:1.7;border-top:1px solid #E5E8EB;" id="privacyDetail">
+        <b>수집 항목</b> 이름, 휴대전화번호<br>
+        <b>수집 목적</b> 서비스 제공 및 신청 관리<br>
+        <b>보유 기간</b> 서비스 종료 후 즉시 파기<br>
+        <span style="color:#8B95A1;">동의 거부 시 서비스 이용이 제한될 수 있습니다.</span>
+      </div>
+      <label id="privacyAgreeLabel" for="privacyAgree" style="display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;border-top:1px solid #E5E8EB;">
+        <div class="toggle-wrap">
+          <input type="checkbox" id="privacyAgree" class="toggle-input">
+          <span class="toggle-slider"></span>
+        </div>
+        <span class="agree-text">위 내용을 확인하였으며, 개인정보 수집 및 이용에 동의합니다.</span>
+      </label>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-confirm" id="modalConfirm" disabled style="opacity:0.4;">동의하고 신청 완료하기</button>
+      <button class="btn-cancel" id="modalCancel">돌아가기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 성공 화면 -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✅</div>
+  <h2>신청접수가 완료됐어요!</h2>
+  <p>결제 안내 알림톡을 확인해 주세요.<br>결제 완료 후 영업일 7일 내 발행돼요.</p>
+  <a href="https://s.tosspayments.com/BnxOr5SYbMi" target="_blank" rel="noopener" class="success-pay-btn">
+    결제하러 가기 →
+  </a>
+  <div class="success-pay-note">토스 · 카카오페이 · 카드 결제 가능 (100,000원 · VAT 별도)</div>
+</div>
+
+<script>
+  // ★ v3 GAS URL — 재배포 시 업데이트
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbz20SjjyYfinAwwuNYAzPTHGGkFBWK4vJQ1BL0ZxJrwYjvcDdswE9wTWk73PgcnEFN-HA/exec';
+
+  // ★ 이벤트 종료일 — 확정 후 수정 (예: new Date('2026-07-07T23:59:59+09:00'))
+  var END_DATE = new Date('2026-07-07T23:59:59+09:00');
+
+  function updateCountdown() {
+    var bar = document.getElementById('countdown-bar');
+    var msLeft = END_DATE - new Date();
+    if (msLeft <= 0) {
+      bar.innerHTML = '<span style="font-size:15px;">이벤트가 종료됐어요</span>';
+      bar.style.background = '#6B7684';
+      return;
+    }
+    var days = Math.ceil(msLeft / 86400000);
+    if (days === 0) {
+      bar.innerHTML = '<span class="dday" style="color:#FBBF24;">오늘 마감!</span><span class="sub">자정에 종료돼요</span>';
+    } else {
+      bar.innerHTML = '<span class="dday">D-' + days + '</span><span class="sub">· ' + days + '일 뒤 이벤트 마감 · 지금 바로 신청하세요</span>';
+    }
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 60000);
+
+  function callAPI(action, params) {
+    var body = JSON.stringify(Object.assign({ action: action }, params || {}));
+    return fetch(GAS_URL, { method: 'POST', body: body })
+      .then(function(res) { return res.json(); });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('form-area').style.display = 'block';
+
+    callAPI('checkAccess').then(function(data) {
+      if (!data.ok) {
+        document.getElementById('form-area').style.display = 'none';
+        document.getElementById('offReason').textContent = data.reason;
+        document.getElementById('offScreen').style.display = 'flex';
+        return;
+      }
+      setupStatusBanner(data);
+    }).catch(function() {});
+  });
+
+  function setupStatusBanner(data) {
+    var hasQuota = data.maxCount > 0;
+    if (!hasQuota) return;
+    var remaining = data.maxCount - data.currentCount;
+    if (remaining > 20) return;
+    var inner = document.getElementById('statusBannerInner');
+    inner.innerHTML = '<div class="status-urgent-msg">⚡ 남은 신청 가능 횟수 <strong>' + remaining + '개</strong></div>';
+    document.getElementById('statusBanner').style.display = 'flex';
+  }
+
+  var kwStatus = { kw1: null, kw2: null, kw3: null };
+  var debounceTimers = {};
+  var urlDebounce = null;
+  var urlCheckDebounce = null;
+
+  function setFeedback(id, type, msg, hint) {
+    var el = document.getElementById('fb-' + id);
+    el.className = 'feedback ' + type;
+    if (hint) {
+      el.style.flexDirection = 'column'; el.style.alignItems = 'flex-start';
+      el.innerHTML = '<span>' + msg + '</span>' +
+        '<div style="margin-top:5px;font-size:12px;color:#8B95A1;line-height:1.6;width:100%;">💡 ' + hint + '</div>';
+    } else {
+      el.style.flexDirection = ''; el.style.alignItems = '';
+      el.textContent = msg;
+    }
+  }
+
+  function kwSuggest(kw) {
+    var replacements = [
+      ['고시원', ['고시텔', '원룸텔', '1인실']],
+      ['원룸', ['원룸텔', '오피스텔', '1룸']],
+      ['오피스텔', ['원룸', '원룸텔', '소형아파트']],
+      ['고시텔', ['고시원', '원룸텔', '1인실']],
+    ];
+    var suggestions = [];
+    for (var i = 0; i < replacements.length; i++) {
+      var from = replacements[i][0], tos = replacements[i][1];
+      if (kw.indexOf(from) !== -1) {
+        tos.forEach(function(to) { suggestions.push(kw.replace(from, to)); });
+        break;
+      }
+    }
+    if (!suggestions.length) suggestions.push(kw + '추천', kw + '후기');
+    return '다른 키워드를 사용해보세요. 예) ' + suggestions.slice(0, 3).map(function(s) { return '<strong>' + s + '</strong>'; }).join(', ') + ' 등';
+  }
+
+  function setKwNum(id, state) {
+    document.getElementById('kw-num-' + id).className = 'kw-num' + (state ? ' ' + state : '');
+  }
+
+  function formatPhone(value) {
+    var digits = value.replace(/\D/g, '');
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 7) return digits.slice(0,3) + '-' + digits.slice(3);
+    return digits.slice(0,3) + '-' + digits.slice(3,7) + '-' + digits.slice(7,11);
+  }
+
+  document.getElementById('phone').addEventListener('input', function() {
+    this.value = formatPhone(this.value);
+    var valid = /^010-\d{4}-\d{4}$/.test(this.value);
+    if (this.value.length === 0) { this.className = ''; setFeedback('phone', '', ''); }
+    else if (valid) { this.className = 'valid'; setFeedback('phone', '', ''); }
+    else { this.className = 'invalid'; setFeedback('phone', 'error', '010-0000-0000 형식으로 입력해 주세요'); }
+    checkSubmit();
+  });
+
+  var urlValid = false;
+
+  document.getElementById('placeUrl').addEventListener('input', function() {
+    var val = this.value.trim();
+    var preview = document.getElementById('placePreview');
+    var formatValid = /^https:\/\/gobang\.kr\/place\/\d+$/.test(val);
+    urlValid = false;
+    clearTimeout(urlCheckDebounce);
+
+    if (val.length === 0) {
+      this.className = ''; setFeedback('url', '', '');
+      preview.style.display = 'none';
+    } else if (formatValid) {
+      this.className = '';
+      setFeedback('url', 'checking', '확인 중...');
+      loadPlaceInfo(val);
+
+      var self = this;
+      urlCheckDebounce = setTimeout(function() {
+        callAPI('checkPlaceUrl', { url: val })
+          .then(function(result) {
+            if (self.value.trim() !== val) return;
+            if (result.error) {
+              urlValid = false; self.className = 'invalid';
+              setFeedback('url', 'error', '중복 확인 중 오류가 발생했어요. 다시 시도해 주세요.');
+            } else if (result.available === false) {
+              urlValid = false; self.className = 'invalid';
+              setFeedback('url', 'error', '이미 신청된 지점이에요. 다른 지점을 선택해 주세요.');
+            } else {
+              urlValid = true; self.className = 'valid';
+              setFeedback('url', 'ok', '신청 가능한 지점이에요');
+            }
+            checkSubmit();
+          })
+          .catch(function() {
+            urlValid = false; self.className = 'invalid';
+            setFeedback('url', 'error', '서버 연결에 실패했어요. 다시 시도해 주세요.');
+            checkSubmit();
+          });
+      }, 300);
+    } else {
+      this.className = 'invalid';
+      setFeedback('url', 'error', 'https://gobang.kr/place/숫자 형식으로 입력해 주세요');
+      preview.style.display = 'none';
+    }
+    checkSubmit();
+  });
+
+  function loadPlaceInfo(url) {
+    var preview = document.getElementById('placePreview');
+    var ogCard = document.getElementById('ogCard');
+    preview.style.display = 'block';
+    preview.className = 'place-preview loading';
+    ogCard.href = url;
+    clearTimeout(urlDebounce);
+    urlDebounce = setTimeout(function() {
+      callAPI('fetchPlaceInfo', { url: url })
+        .then(function(result) {
+          preview.className = 'place-preview loaded';
+          if (result.ogTitle) document.getElementById('ogTitle').textContent = result.ogTitle;
+          if (result.ogDesc) document.getElementById('ogDesc').textContent = result.ogDesc;
+          if (result.ogImage) {
+            var img = document.createElement('img');
+            img.src = result.ogImage; img.alt = '';
+            document.getElementById('ogImageWrap').innerHTML = '';
+            document.getElementById('ogImageWrap').appendChild(img);
+          }
+          if (result.deposit) document.getElementById('deposit').value = result.deposit;
+          if (result.monthly) document.getElementById('monthly').value = result.monthly;
+          if (result.walking) document.getElementById('walking').value = result.walking;
+        })
+        .catch(function() { preview.className = 'place-preview loaded'; });
+    }, 400);
+  }
+
+  document.getElementById('name').addEventListener('input', checkSubmit);
+
+  document.getElementById('description').addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length;
+    checkSubmit();
+  });
+
+  ['kw1', 'kw2', 'kw3'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', function() {
+      var val = this.value.trim();
+      kwStatus[id] = null;
+      setKwNum(id, '');
+      if (val.length === 0) { this.className = ''; setFeedback(id, '', ''); checkSubmit(); return; }
+      setKwNum(id, 'active');
+      setFeedback(id, 'checking', '확인 중...');
+      this.className = '';
+      clearTimeout(debounceTimers[id]);
+      var self = this;
+      debounceTimers[id] = setTimeout(function() {
+        callAPI('checkKeyword', { keyword: val })
+          .then(function(result) {
+            if (self.value.trim() !== val) return;
+            if (result.available) {
+              kwStatus[id] = true; self.className = 'valid';
+              setKwNum(id, 'valid-num'); setFeedback(id, 'ok', '사용 가능한 키워드예요');
+            } else {
+              kwStatus[id] = false; self.className = 'invalid';
+              setKwNum(id, 'invalid-num');
+              setFeedback(id, 'error', result.remainingDays + '일 뒤 사용 가능해요.', kwSuggest(val));
+            }
+            checkSubmit();
+          })
+          .catch(function() { setFeedback(id, 'error', '확인 중 오류가 발생했어요'); checkSubmit(); });
+      }, 300);
+    });
+  });
+
+  function checkSubmit() {
+    var name = document.getElementById('name').value.trim();
+    var phone = document.getElementById('phone').value.trim();
+    var kw1 = document.getElementById('kw1').value.trim();
+    var kw2 = document.getElementById('kw2').value.trim();
+    var kw3 = document.getElementById('kw3').value.trim();
+    var desc = document.getElementById('description').value.trim();
+    var ok =
+      name.length >= 2 &&
+      /^010-\d{4}-\d{4}$/.test(phone) &&
+      urlValid === true &&
+      kw1.length > 0 && kwStatus.kw1 === true &&
+      (kw2.length === 0 || kwStatus.kw2 === true) &&
+      (kw3.length === 0 || kwStatus.kw3 === true) &&
+      desc.length > 0 &&
+      document.getElementById('agreeToggle').checked &&
+      document.getElementById('agreeToggle2').checked;
+    document.getElementById('submitBtn').disabled = !ok;
+  }
+
+  document.getElementById('agreeToggle').addEventListener('change', checkSubmit);
+  document.getElementById('agreeToggle2').addEventListener('change', checkSubmit);
+
+  var selectedTemplate = 'A';
+  document.querySelectorAll('.template-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.template-card').forEach(function(c) { c.classList.remove('selected'); });
+      this.classList.add('selected');
+      selectedTemplate = this.getAttribute('data-type');
+    });
+  });
+
+  document.querySelectorAll('.template-card-help').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var type = this.getAttribute('data-type');
+      document.getElementById('desc-item-A').style.display = type === 'A' ? 'block' : 'none';
+      document.getElementById('desc-item-B').style.display = type === 'B' ? 'block' : 'none';
+      document.getElementById('templateModal').classList.add('show');
+    });
+  });
+  document.getElementById('templateModalClose').addEventListener('click', function() {
+    document.getElementById('templateModal').classList.remove('show');
+  });
+
+  document.getElementById('applyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var name = document.getElementById('name').value.trim();
+    var phone = document.getElementById('phone').value.trim();
+    var url = document.getElementById('placeUrl').value.trim();
+    var kw1 = document.getElementById('kw1').value.trim();
+    var kw2 = document.getElementById('kw2').value.trim();
+    var kw3 = document.getElementById('kw3').value.trim();
+    var kwList = [kw1, kw2, kw3].filter(Boolean).join(' / ');
+    var rows = [
+      { label: '이름', value: name },
+      { label: '전화번호', value: phone },
+      { label: '지점 URL', value: url },
+      { label: '키워드', value: kwList },
+      { label: '작성 타입', value: selectedTemplate === 'A' ? 'A타입 (설명형)' : 'B타입 (후기형)' }
+    ];
+    var html = rows.map(function(r) {
+      return '<div class="summary-row"><span class="summary-label">' + r.label + '</span><span class="summary-value">' + r.value + '</span></div>';
+    }).join('');
+    document.getElementById('modalSummary').innerHTML = html;
+    document.getElementById('privacyAgree').checked = false;
+    document.getElementById('modalConfirm').disabled = true;
+    document.getElementById('modalConfirm').style.opacity = '0.4';
+    document.getElementById('privacyDetail').style.display = 'none';
+    document.getElementById('privacyArrow').textContent = '▶ 내용 보기';
+    document.getElementById('modalOverlay').classList.add('show');
+  });
+
+  document.getElementById('privacyToggleHeader').addEventListener('click', function() {
+    var detail = document.getElementById('privacyDetail');
+    var arrow = document.getElementById('privacyArrow');
+    var open = detail.style.display !== 'none';
+    detail.style.display = open ? 'none' : 'block';
+    arrow.textContent = open ? '▶ 내용 보기' : '▼ 접기';
+  });
+
+  document.getElementById('privacyAgreeLabel').addEventListener('click', function(e) {
+    e.stopPropagation();
+    setTimeout(function() {
+      var checked = document.getElementById('privacyAgree').checked;
+      var btn = document.getElementById('modalConfirm');
+      btn.disabled = !checked;
+      btn.style.opacity = checked ? '1' : '0.4';
+    }, 0);
+  });
+
+  document.getElementById('modalCancel').addEventListener('click', function() {
+    document.getElementById('modalOverlay').classList.remove('show');
+  });
+
+  document.getElementById('modalConfirm').addEventListener('click', function() {
+    document.getElementById('modalOverlay').classList.remove('show');
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '신청 중...';
+
+    callAPI('submitForm', {
+      name: document.getElementById('name').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      placeUrl: document.getElementById('placeUrl').value.trim(),
+      keyword1: document.getElementById('kw1').value.trim(),
+      keyword2: document.getElementById('kw2').value.trim(),
+      keyword3: document.getElementById('kw3').value.trim(),
+      description: document.getElementById('description').value.trim(),
+      deposit: document.getElementById('deposit').value.trim(),
+      monthly: document.getElementById('monthly').value.trim(),
+      walking: document.getElementById('walking').value.trim(),
+      templateType: selectedTemplate,
+      source: 'v3'
+    }).then(function(result) {
+      if (result.success) {
+        document.getElementById('form-area').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'flex';
+        window.scrollTo(0, 0);
+      } else {
+        btn.disabled = false; btn.textContent = '신청 접수하기';
+        if (result.reason === 'duplicate_url') {
+          alert('이미 신청된 지점 URL이에요. 다른 지점을 선택해 주세요.');
+        } else {
+          alert('오류가 발생했어요. 다시 시도해 주세요.');
+        }
+      }
+    }).catch(function() {
+      btn.disabled = false; btn.textContent = '신청 접수하기';
+      alert('오류가 발생했어요. 다시 시도해 주세요.');
+    });
+  });
+</script>
+</body>
+</html>
