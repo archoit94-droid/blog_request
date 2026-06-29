@@ -3,617 +3,303 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>고방 공식 블로그 작성 서비스 · 기존 고객 한정가</title>
+<title>원장님 한정 · 10만원 블로그 — 7일 후 마감</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --navy:#1A3A6B; --navy-deep:#0F2548;
-    --primary:#2B85CC; --primary-hover:#1E6FA8;
-    --accent:#2B85CC; --sky:#7FC0F0;
-    --gold:#E8B84B; --gold-text:#B0801E;
-    --bg:#F8FAFC; --surface:#FFFFFF;
-    --t-title:#1A202C; --t-body:#4A5568; --t-cap:#718096;
-    --border:#E2E8F0; --ok:#00C73C; --err:#F04452;
-    --danger:#E0162B;
-    --r-sm:8px; --r-md:12px; --r-lg:16px;
-  }
   *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --navy:#0E1B33; --navy-2:#16264A; --ink:#0E1B33;
+    --blue:#3182F6; --blue-d:#1B6CF2;
+    --red:#E0162B; --red-d:#B80E20; --red-soft:#FFE9EB;
+    --gold:#FFC84D;
+    --bg:#F4F6F9; --sur:#FFFFFF; --line:#E5E8EB;
+    --t1:#0E1B33; --t2:#4A5568; --t3:#8B95A1;
+    --f:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+  }
   html{scroll-behavior:smooth}
-  body{
-    font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-    background:var(--bg); color:var(--t-body);
-    font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;
-  }
-  a{color:inherit;text-decoration:none}
-  img{max-width:100%;display:block}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
-  h1,h2,h3{color:var(--t-title);font-weight:700;line-height:1.3}
-  section{padding:80px 0}
-  .center{text-align:center}
-  .eyebrow{
-    display:inline-block;font-size:14px;font-weight:600;letter-spacing:.04em;
-    color:var(--primary);text-transform:uppercase;margin-bottom:14px;
-  }
-  .sec-title{font-size:32px;margin-bottom:14px}
-  .sec-sub{font-size:18px;color:var(--t-body);max-width:620px;margin:0 auto}
-  .hl{
-    color:var(--primary);font-weight:800;
-    background:linear-gradient(180deg,transparent 60%,rgba(43,133,204,.22) 60%);
-    padding:0 2px;
-  }
-  .hl-gold{
-    color:var(--gold-text);font-weight:800;
-    background:linear-gradient(180deg,transparent 60%,rgba(232,184,75,.28) 60%);
-    padding:0 2px;
-  }
+  body{font-family:var(--f);background:var(--bg);color:var(--t2);line-height:1.6;
+       -webkit-font-smoothing:antialiased;padding-bottom:78px;padding-top:38px}
+  .wrap{max-width:560px;margin:0 auto;padding:0 20px}
 
-  /* NAV */
-  .nav{
-    position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);
-    backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
-  }
-  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
-  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;color:var(--navy)}
-  .logo-mark{
-    width:30px;height:30px;border-radius:8px;
-    background:linear-gradient(135deg,var(--primary),var(--navy));
-    display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;
-  }
-  .nav-menu{display:flex;gap:28px;font-size:15px;font-weight:500}
-  .nav-menu a{color:var(--t-body);transition:color .15s}
-  .nav-menu a:hover{color:var(--primary)}
-  .nav-cta{
-    background:var(--primary);color:#fff;font-weight:700;font-size:15px;
-    padding:10px 20px;border-radius:var(--r-sm);transition:background .15s;
-  }
-  .nav-cta:hover{background:var(--primary-hover)}
-  .nav-cta:focus-visible,a:focus-visible,button:focus-visible{
-    outline:3px solid rgba(43,133,204,.45);outline-offset:2px
-  }
+  /* 상단 긴급 바 */
+  #topbar{position:fixed;top:0;left:0;right:0;z-index:80;height:38px;
+    background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;
+    font-size:13px;font-weight:700;letter-spacing:-.2px}
+  #topbar .tb-t{font-variant-numeric:tabular-nums;font-weight:800;color:var(--gold)}
 
-  /* HERO */
-  .hero{
-    background:linear-gradient(180deg,#FFFFFF 0%,#EAF4FC 100%);
-    padding:72px 0 88px;text-align:center;position:relative;overflow:hidden;
-  }
-  .badge-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
-  .chip{
-    display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;
-    padding:7px 14px;border-radius:999px;background:#fff;border:1px solid var(--border);color:var(--navy);
-  }
-  .chip.gold{background:#FFF8E8;border-color:#F0DCA6;color:var(--gold-text)}
-  .chip svg{width:15px;height:15px}
-  .hero h1{
-    font-size:48px;font-weight:800;letter-spacing:-.02em;line-height:1.25;
-    color:var(--navy-deep);margin-bottom:22px;
-  }
-  .hero p.lead{font-size:19px;color:var(--t-body);max-width:580px;margin:0 auto 34px}
+  /* 히어로 (다크 프리미엄) */
+  .hero{background:linear-gradient(165deg,var(--navy) 0%,var(--navy-2) 100%);
+    color:#fff;text-align:center;padding:40px 20px 44px;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(120% 80% at 50% -10%,rgba(49,130,246,.28),transparent 60%);pointer-events:none}
+  .hero>*{position:relative;z-index:1}
+  .vip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+    color:var(--gold);border:1px solid rgba(255,200,77,.4);background:rgba(255,200,77,.08);
+    border-radius:100px;padding:6px 14px;margin-bottom:20px;letter-spacing:-.2px}
+  .hero h1{font-size:30px;font-weight:900;line-height:1.28;letter-spacing:-.8px;color:#fff;margin-bottom:14px}
+  .hero h1 .pt{color:var(--gold)}
+  .hero .lead{font-size:15px;color:#B8C4D8;max-width:380px;margin:0 auto 26px;line-height:1.7}
 
-  /* COUNTDOWN */
-  .count-box{
-    display:inline-block;background:#fff;border:1px solid #F4C0C5;
-    border-radius:var(--r-lg);padding:22px 30px;margin:0 auto 36px;
-    box-shadow:0 8px 30px rgba(224,22,43,.10);
-  }
-  .count-label{
-    display:flex;align-items:center;justify-content:center;gap:7px;
-    font-size:14px;font-weight:700;color:var(--danger);margin-bottom:14px;
-  }
-  .count-label svg{width:17px;height:17px}
-  .count-timer{display:flex;gap:10px;justify-content:center;align-items:flex-start}
-  .ct-unit{display:flex;flex-direction:column;align-items:center;min-width:62px}
-  .ct-num{
-    font-size:38px;font-weight:800;color:var(--danger);
-    font-variant-numeric:tabular-nums;line-height:1;
-    background:#FFF1F2;border-radius:var(--r-sm);padding:12px 10px;min-width:62px;
-  }
-  .ct-cap{font-size:12px;font-weight:600;color:var(--t-cap);margin-top:8px}
-  .ct-sep{font-size:32px;font-weight:800;color:#F4C0C5;line-height:1.6}
-  .count-expired{font-size:17px;font-weight:700;color:var(--danger);padding:6px 0}
+  /* 카운트다운 */
+  .cd{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+    border-radius:16px;padding:18px;margin:0 auto 22px;max-width:380px}
+  .cd-label{display:flex;align-items:center;justify-content:center;gap:6px;
+    font-size:13px;font-weight:700;color:#FF8A95;margin-bottom:14px}
+  .cd-grid{display:flex;justify-content:center;gap:8px}
+  .cd-u{flex:1;max-width:74px;background:rgba(224,22,43,.16);border:1px solid rgba(255,138,149,.3);
+    border-radius:10px;padding:10px 4px}
+  .cd-n{font-size:30px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
+  .cd-c{font-size:11px;font-weight:600;color:#FF8A95;margin-top:5px}
+  .cd-expired{font-size:16px;font-weight:800;color:#FF8A95;padding:8px 0}
 
-  /* PRICE BLOCK (shared 2-line pattern) */
-  .price2{display:inline-flex;flex-direction:column;align-items:center;gap:2px}
-  .price-old{font-size:19px;color:var(--t-cap);text-decoration:line-through;font-weight:500}
-  .price-now-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;justify-content:center}
-  .price-now{font-size:42px;font-weight:800;color:var(--navy-deep);letter-spacing:-.02em}
-  .price-now small{font-size:18px;font-weight:700}
-  .disc-badge{
-    background:var(--danger);color:#fff;font-size:15px;font-weight:800;
-    padding:5px 12px;border-radius:999px;align-self:center;
-  }
-  .vat{font-size:14px;color:var(--t-cap);font-weight:500;margin-top:4px}
+  /* 가격 */
+  .price{margin-bottom:26px}
+  .price .old{font-size:17px;color:#8B95A1;text-decoration:line-through;font-weight:500}
+  .price .now-row{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-top:2px}
+  .price .now{font-size:48px;font-weight:900;color:#fff;letter-spacing:-1.5px}
+  .price .now small{font-size:20px;font-weight:700}
+  .price .off{background:var(--red);color:#fff;font-size:14px;font-weight:800;
+    padding:4px 11px;border-radius:100px}
+  .price .vat{font-size:13px;color:#8B95A1;margin-top:6px}
 
-  /* CTA buttons */
-  .btn-primary{
-    display:inline-flex;align-items:center;justify-content:center;gap:9px;
-    background:linear-gradient(135deg,var(--primary),var(--navy));
-    color:#fff;font-size:18px;font-weight:700;
-    padding:18px 40px;border-radius:var(--r-md);border:none;cursor:pointer;
-    min-height:44px;transition:transform .2s,box-shadow .2s;
-    box-shadow:0 10px 26px rgba(43,133,204,.32);
-  }
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(43,133,204,.42)}
-  .btn-primary svg{width:20px;height:20px}
-  .hero-cta-note{margin-top:14px;font-size:14px;color:var(--t-cap)}
+  /* CTA */
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+    background:var(--blue);color:#fff;font-size:18px;font-weight:800;letter-spacing:-.3px;
+    padding:18px;border-radius:14px;text-decoration:none;border:none;cursor:pointer;
+    box-shadow:0 10px 30px rgba(49,130,246,.4);transition:transform .15s,background .15s}
+  .cta:hover{background:var(--blue-d);transform:translateY(-2px)}
+  .cta svg{width:20px;height:20px}
+  .cta-note{font-size:13px;color:#FF8A95;font-weight:600;margin-top:12px}
 
-  /* METRICS */
-  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:54px}
-  .metric{
-    background:#fff;border:1px solid var(--border);border-radius:var(--r-md);
-    padding:26px 18px;text-align:center;
-  }
-  .metric .num{font-size:34px;font-weight:800;color:var(--primary);letter-spacing:-.02em}
-  .metric .lab{font-size:14px;color:var(--t-body);margin-top:6px;font-weight:500}
+  /* 본문 섹션 */
+  .sec{background:var(--sur);margin-top:10px;padding:30px 20px;border-radius:0}
+  .sec-eyb{font-size:12px;font-weight:800;color:var(--blue);letter-spacing:.04em;text-transform:uppercase;
+    text-align:center;margin-bottom:8px}
+  .sec-h{font-size:23px;font-weight:900;color:var(--t1);text-align:center;line-height:1.3;
+    letter-spacing:-.6px;margin-bottom:6px}
+  .sec-h .hl{color:var(--blue)}
+  .sec-sub{font-size:14px;color:var(--t2);text-align:center;max-width:420px;margin:0 auto 24px}
 
-  /* generic grid cards */
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:48px}
-  .card{
-    background:#fff;border:1px solid var(--border);border-radius:var(--r-md);
-    padding:30px 26px;text-align:left;transition:transform .2s,box-shadow .2s;
-  }
-  .card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(26,58,107,.08)}
-  .ic{
-    width:46px;height:46px;border-radius:12px;background:#EAF4FC;
-    display:flex;align-items:center;justify-content:center;margin-bottom:18px;
-  }
-  .ic svg{width:24px;height:24px;stroke:var(--primary)}
-  .card h3{font-size:19px;margin-bottom:10px}
-  .card p{font-size:15px;color:var(--t-body)}
+  /* 가치 3포인트 */
+  .pts{display:flex;flex-direction:column;gap:12px}
+  .pt{display:flex;align-items:center;gap:14px;background:var(--bg);border-radius:14px;padding:16px 18px}
+  .pt-ic{width:46px;height:46px;border-radius:12px;background:#EAF2FF;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center}
+  .pt-ic svg{width:24px;height:24px}
+  .pt-t{font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-.3px}
+  .pt-d{font-size:13px;color:var(--t2);margin-top:2px;line-height:1.5}
 
-  .dark{background:linear-gradient(160deg,var(--navy),var(--navy-deep));color:#E2EAF4}
-  .dark .sec-title{color:#fff}
-  .dark .sec-sub{color:#BBD0EA}
-  .dark .eyebrow{color:var(--sky)}
-  .dark .hl{color:var(--sky);background:linear-gradient(180deg,transparent 60%,rgba(127,192,240,.28) 60%)}
+  /* 정가 vs 한정가 */
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+  .vs-col{padding:24px 16px;text-align:center}
+  .vs-col.a{background:var(--bg)}
+  .vs-col.b{background:linear-gradient(165deg,var(--navy),var(--navy-2));position:relative}
+  .vs-tag{font-size:12px;font-weight:700;margin-bottom:10px}
+  .vs-col.a .vs-tag{color:var(--t3)}
+  .vs-col.b .vs-tag{color:var(--gold)}
+  .vs-amt{font-size:26px;font-weight:900;letter-spacing:-1px}
+  .vs-col.a .vs-amt{color:var(--t3);text-decoration:line-through}
+  .vs-col.b .vs-amt{color:#fff}
+  .vs-amt small{font-size:14px;font-weight:700}
+  .vs-note{font-size:12px;margin-top:6px}
+  .vs-col.a .vs-note{color:var(--t3)}
+  .vs-col.b .vs-note{color:#B8C4D8}
+  .vs-col.b::before{content:"지금";position:absolute;top:10px;left:50%;transform:translateX(-50%);
+    background:var(--red);color:#fff;font-size:11px;font-weight:800;padding:2px 10px;border-radius:100px}
 
-  /* STEPS */
-  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:48px}
-  .step{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--r-md);padding:26px 22px}
-  .step .n{font-size:14px;font-weight:800;color:var(--sky);letter-spacing:.05em;margin-bottom:12px}
-  .step h3{color:#fff;font-size:17px;margin-bottom:8px}
-  .step p{font-size:14px;color:#BBD0EA}
+  /* 마감 임박 CTA */
+  .final{background:linear-gradient(165deg,var(--navy),var(--navy-2));color:#fff;
+    text-align:center;padding:40px 20px;margin-top:10px}
+  .final h2{font-size:25px;font-weight:900;color:#fff;line-height:1.32;letter-spacing:-.6px;margin-bottom:10px}
+  .final h2 .pt{color:var(--gold)}
+  .final p{font-size:14px;color:#B8C4D8;margin-bottom:22px}
+  .final .cta-note{margin-top:14px}
 
-  /* COMPARE TABLE */
-  .tbl-wrap{margin-top:48px;overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border)}
-  table{width:100%;border-collapse:collapse;background:#fff;min-width:560px}
-  th,td{padding:16px 18px;text-align:center;font-size:15px;border-bottom:1px solid var(--border)}
-  th{background:var(--navy);color:#fff;font-weight:700;font-size:15px}
-  td:first-child,th:first-child{text-align:left;font-weight:600;color:var(--t-title)}
-  tr:last-child td{border-bottom:none}
-  .col-hi{background:#EAF4FC}
-  td.col-hi{font-weight:700;color:var(--navy)}
-  .check{color:var(--ok);font-weight:800}
-  .cross{color:var(--t-cap)}
+  /* 스티키 하단 */
+  .sticky{position:fixed;bottom:0;left:0;right:0;z-index:70;background:var(--sur);
+    border-top:1px solid var(--line);box-shadow:0 -4px 18px rgba(0,0,0,.07);padding:10px 16px}
+  .sticky-in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px}
+  .sticky-left{flex-shrink:0;line-height:1.15}
+  .sticky-left .sl-time{font-size:12px;font-weight:800;color:var(--red);font-variant-numeric:tabular-nums}
+  .sticky-left .sl-price{font-size:17px;font-weight:900;color:var(--t1)}
+  .sticky-left .sl-price small{font-size:11px;font-weight:600;color:var(--t3)}
+  .sticky .cta{padding:14px 22px;font-size:16px;box-shadow:0 6px 16px rgba(49,130,246,.3);flex:1}
 
-  /* TYPE CARDS */
-  .type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:48px}
-  .type{background:#fff;border:2px solid var(--border);border-radius:var(--r-lg);padding:34px 30px;text-align:left}
-  .type .tag{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:var(--primary);padding:5px 14px;border-radius:999px;margin-bottom:16px}
-  .type:nth-child(2) .tag{background:var(--navy)}
-  .type h3{font-size:22px;margin-bottom:8px}
-  .type ul{list-style:none;margin-top:16px}
-  .type li{display:flex;gap:10px;align-items:flex-start;font-size:15px;margin-bottom:10px;color:var(--t-body)}
-  .type li svg{width:18px;height:18px;stroke:var(--primary);flex-shrink:0;margin-top:3px}
+  footer{text-align:center;padding:26px 20px;font-size:12px;color:var(--t3)}
 
-  /* PRICE SECTION */
-  .price-card{
-    max-width:520px;margin:48px auto 0;background:#fff;border:1px solid var(--border);
-    border-radius:var(--r-lg);padding:44px 38px;text-align:center;
-    box-shadow:0 16px 40px rgba(26,58,107,.10);position:relative;
+  @media (max-width:380px){
+    .hero h1{font-size:26px} .price .now{font-size:40px}
+    .cd-n{font-size:25px} .sticky-left .sl-price{font-size:15px}
   }
-  .price-card .ribbon{
-    position:absolute;top:-14px;left:50%;transform:translateX(-50%);
-    background:var(--gold);color:#fff;font-size:13px;font-weight:800;
-    padding:7px 18px;border-radius:999px;white-space:nowrap;
-  }
-  .price-name{font-size:20px;font-weight:700;color:var(--navy);margin:10px 0 22px}
-  .price-card .price2{margin-bottom:26px}
-  .pc-features{text-align:left;margin:0 0 28px;list-style:none}
-  .pc-features li{display:flex;gap:10px;align-items:flex-start;font-size:15px;margin-bottom:12px}
-  .pc-features li svg{width:18px;height:18px;stroke:var(--ok);flex-shrink:0;margin-top:3px}
-
-  /* FAQ */
-  .faq{max-width:760px;margin:48px auto 0}
-  details{background:#fff;border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:12px;overflow:hidden}
-  summary{
-    cursor:pointer;list-style:none;padding:20px 24px;font-size:17px;font-weight:600;color:var(--t-title);
-    display:flex;justify-content:space-between;align-items:center;gap:12px;
-  }
-  summary::-webkit-details-marker{display:none}
-  summary .arr{transition:transform .2s;color:var(--primary);flex-shrink:0}
-  details[open] summary .arr{transform:rotate(180deg)}
-  details .ans{padding:0 24px 22px;font-size:15px;color:var(--t-body);line-height:1.7}
-
-  /* CTA FINAL */
-  .final{background:linear-gradient(160deg,var(--primary),var(--navy));text-align:center;color:#fff}
-  .final h2{color:#fff;font-size:34px;margin-bottom:14px}
-  .final p{color:#D6E8F8;font-size:18px;margin-bottom:30px}
-  .final .price2 .price-old{color:#9FC2E6}
-  .final .price2 .price-now{color:#fff}
-  .final .price2 .vat{color:#CFE2F5}
-  .final .btn-primary{background:#fff;color:var(--navy-deep);box-shadow:0 12px 30px rgba(0,0,0,.25);margin-top:26px}
-  .final .btn-primary:hover{background:#F0F6FC}
-
-  /* STICKY BOTTOM CTA */
-  .sticky{
-    position:fixed;bottom:0;left:0;right:0;z-index:60;
-    background:rgba(255,255,255,.97);backdrop-filter:blur(10px);
-    border-top:1px solid var(--border);box-shadow:0 -4px 20px rgba(0,0,0,.07);
-    padding:12px 0;
-  }
-  .sticky-in{display:flex;align-items:center;justify-content:space-between;gap:18px}
-  .sticky-price{display:flex;flex-direction:column;line-height:1.2}
-  .sticky-price .so{font-size:13px;color:var(--t-cap);text-decoration:line-through}
-  .sticky-price .sn{font-size:21px;font-weight:800;color:var(--navy-deep)}
-  .sticky-price .sn small{font-size:13px;font-weight:600;color:var(--t-cap)}
-  .sticky-timer{font-size:14px;font-weight:700;color:var(--danger);font-variant-numeric:tabular-nums;white-space:nowrap}
-  .sticky .btn-primary{padding:14px 30px;font-size:16px;box-shadow:0 6px 18px rgba(43,133,204,.3)}
-  body{padding-bottom:84px}
-
-  footer{background:var(--navy-deep);color:#8FA6C4;text-align:center;padding:34px 0;font-size:13px}
-
-  @media (max-width:1024px){
-    .metrics{grid-template-columns:repeat(2,1fr)}
-    .steps{grid-template-columns:repeat(2,1fr)}
-    .grid3{grid-template-columns:repeat(2,1fr)}
-  }
-  @media (max-width:768px){
-    .nav-menu{display:none}
-    .hero h1{font-size:34px}
-    .sec-title{font-size:26px}
-    section{padding:60px 0}
-    .grid3,.type-grid{grid-template-columns:1fr}
-  }
-  @media (max-width:480px){
-    .hero h1{font-size:28px}
-    .metrics{grid-template-columns:1fr}
-    .steps{grid-template-columns:1fr}
-    .ct-num{font-size:30px;min-width:52px;padding:10px 6px}
-    .ct-unit{min-width:52px}
-    .price-now{font-size:34px}
-    .sticky-price .sn{font-size:18px}
-    .sticky-timer{display:none}
-    .sticky .btn-primary{padding:13px 20px;font-size:15px}
-  }
-  @media (prefers-reduced-motion:reduce){
-    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
-  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
-  <div class="wrap nav-in">
-    <a href="#top" class="logo"><span class="logo-mark" aria-hidden="true">G</span>고방 블로그</a>
-    <div class="nav-menu">
-      <a href="#why">왜 고방인가</a>
-      <a href="#type">타입 선택</a>
-      <a href="#process">진행과정</a>
-      <a href="#compare">가성비</a>
-      <a href="#faq">FAQ</a>
-    </div>
-    <a href="#price" class="nav-cta">지금 신청</a>
-  </div>
-</nav>
+<!-- 상단 긴급 바 -->
+<div id="topbar">
+  <span id="tbWrap">🔥 원장님 한정 특가 마감까지 <span class="tb-t" id="tbTime">--:--:--</span></span>
+</div>
 
-<!-- HERO -->
-<header class="hero" id="top">
+<!-- 히어로 -->
+<header class="hero">
   <div class="wrap">
-    <div class="badge-row">
-      <span class="chip gold">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 17.3 5.7 21.4 8 14 2 9.4h7.6z"/></svg>
-        기존 고객 한정 프로모션
-      </span>
-      <span class="chip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-        동일 지점 1회 한정
-      </span>
-    </div>
+    <span class="vip">고방 이용 원장님께만 보내는 비공개 링크</span>
+    <h1>블로그 글 한 편<br><span class="pt">정가 30만 → 10만원</span></h1>
+    <p class="lead">이미 고방을 이용 중인 원장님께만, 단 한 번 열어드리는 한정가입니다.</p>
 
-    <h1>
-      월 17만 명이 보는 고방 공식 블로그에<br>
-      <span class="hl">우리 지점 홍보글</span>이 올라갑니다<br>
-      네이버 VIEW탭 상위노출까지
-    </h1>
-    <p class="lead">전문 에디터가 영업일 7일 내 발행. 키워드는 직접 정하고, 글 타입만 고르세요.</p>
-
-    <!-- COUNTDOWN -->
-    <div class="count-box" role="timer" aria-live="polite">
-      <div class="count-label">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        한정가 마감까지
-      </div>
-      <div class="count-timer" id="timer">
-        <div class="ct-unit"><span class="ct-num" id="d">00</span><span class="ct-cap">일</span></div>
-        <span class="ct-sep">:</span>
-        <div class="ct-unit"><span class="ct-num" id="h">00</span><span class="ct-cap">시간</span></div>
-        <span class="ct-sep">:</span>
-        <div class="ct-unit"><span class="ct-num" id="m">00</span><span class="ct-cap">분</span></div>
-        <span class="ct-sep">:</span>
-        <div class="ct-unit"><span class="ct-num" id="s">00</span><span class="ct-cap">초</span></div>
+    <!-- 카운트다운 -->
+    <div class="cd" id="cdBox" role="timer" aria-live="polite">
+      <div class="cd-label">⏳ 이 링크가 닫히기까지</div>
+      <div class="cd-grid" id="cdGrid">
+        <div class="cd-u"><div class="cd-n" id="cdD">00</div><div class="cd-c">일</div></div>
+        <div class="cd-u"><div class="cd-n" id="cdH">00</div><div class="cd-c">시간</div></div>
+        <div class="cd-u"><div class="cd-n" id="cdM">00</div><div class="cd-c">분</div></div>
+        <div class="cd-u"><div class="cd-n" id="cdS">00</div><div class="cd-c">초</div></div>
       </div>
     </div>
 
-    <!-- HERO PRICE (2-line) -->
-    <div class="price2" style="margin-bottom:30px">
-      <span class="price-old">정가 300,000원</span>
-      <span class="price-now-row">
-        <span class="price-now">100,000<small>원</small></span>
-        <span class="disc-badge">67% OFF</span>
-      </span>
-      <span class="vat">VAT 별도 · 기존 고객 한정가</span>
+    <!-- 가격 -->
+    <div class="price">
+      <div class="old">정가 300,000원</div>
+      <div class="now-row">
+        <span class="now">100,000<small>원</small></span>
+        <span class="off">67%↓</span>
+      </div>
+      <div class="vat">VAT 별도 · 동일 지점 1회 한정</div>
     </div>
 
-    <div>
-      <a href="#price" class="btn-primary" id="heroCta">
-        지금 한정가로 신청하기
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </a>
-      <p class="hero-cta-note">신청 후 키워드만 보내주시면 끝. 평균 영업일 7일 내 발행</p>
-    </div>
-
-    <!-- METRICS -->
-    <div class="metrics">
-      <div class="metric"><div class="num">17만</div><div class="lab">고방 공식 블로그 월 방문</div></div>
-      <div class="metric"><div class="num">VIEW탭</div><div class="lab">네이버 상위노출 목표</div></div>
-      <div class="metric"><div class="num">7일</div><div class="lab">영업일 내 발행</div></div>
-      <div class="metric"><div class="num">1~3개</div><div class="lab">직접 정하는 타깃 키워드</div></div>
-    </div>
+    <a href="form.html" class="cta applyLink">
+      지금 한정가로 신청하기
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+    <p class="cta-note" id="heroNote">마감 후 이 링크는 정가로 복귀합니다</p>
   </div>
 </header>
 
-<!-- WHY -->
-<section id="why">
-  <div class="wrap center">
-    <span class="eyebrow">Why 고방</span>
-    <h2 class="sec-title">왜 직접 쓰는 것보다 효과적일까요</h2>
-    <p class="sec-sub">이미 검색에 강한 채널에 올라타는 것, 그게 핵심입니다.</p>
-    <div class="grid3">
-      <div class="card">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></div>
-        <h3>이미 검색에 강한 채널</h3>
-        <p>신규 블로그는 노출까지 수개월. 고방 공식 블로그는 <strong>월 17만 방문·축적된 지수</strong>로 시작부터 다릅니다.</p>
+<!-- 왜 지금 -->
+<section class="sec">
+  <div class="wrap">
+    <p class="sec-eyb">Why now</p>
+    <h2 class="sec-h">신규 블로그론 <span class="hl">몇 달</span> 걸릴 일을</h2>
+    <p class="sec-sub">월 17만 명이 보는 고방 공식 블로그에 바로 올라탑니다.</p>
+    <div class="pts">
+      <div class="pt">
+        <div class="pt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="11" rx="2" fill="#3182F6"/><path fill="#1B6CF2" d="M2 5h16v2H2z"/><rect x="4" y="9.5" width="7" height="1.5" rx=".75" fill="#EAF2FF"/></svg></div>
+        <div><div class="pt-t">월 17만 방문 공식 블로그</div><div class="pt-d">검색에 이미 강한 채널에서 시작합니다.</div></div>
       </div>
-      <div class="card">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
-        <h3>VIEW탭 상위노출 설계</h3>
-        <p>제출하신 <strong>키워드 1~3개</strong>를 검색 의도에 맞춰 배치. VIEW탭 상위 노출을 목표로 작성합니다.</p>
+      <div class="pt">
+        <div class="pt-ic"><svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6.5" fill="none" stroke="#3182F6" stroke-width="2"/><path d="M14 14l4 4" stroke="#1B6CF2" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+        <div><div class="pt-t">VIEW탭 상위노출 목표</div><div class="pt-d">원하는 키워드 1~3개를 직접 정하세요.</div></div>
       </div>
-      <div class="card">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
-        <h3>전문 에디터가 대필</h3>
-        <p>지점 정보만 주시면 끝. 글감 고민·작성·발행까지 <strong>전 과정을 대행</strong>합니다.</p>
+      <div class="pt">
+        <div class="pt-ic"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="2.5" width="10" height="13" rx="1.5" fill="#3182F6"/><rect x="5" y="6" width="6" height="1.2" rx=".6" fill="#fff"/><rect x="5" y="8.5" width="4" height="1.2" rx=".6" fill="#fff"/><circle cx="14" cy="14" r="4.5" fill="#23B169"/><path fill="#fff" d="M11.5 14l1.7 1.7L17 12.4l-1-1-2.8 2.8-.7-.7z"/></svg></div>
+        <div><div class="pt-t">영업일 7일 내 발행</div><div class="pt-d">전문 에디터가 작성, 완료 시 알림톡 전달.</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- TYPE SELECT -->
-<section id="type" style="background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-  <div class="wrap center">
-    <span class="eyebrow">Type</span>
-    <h2 class="sec-title">A·B 두 가지 글 타입 중 선택</h2>
-    <p class="sec-sub">홍보 목적에 맞는 톤을 고르세요. 신청 시 하나만 선택합니다.</p>
-    <div class="type-grid">
-      <div class="type">
-        <span class="tag">A타입 · 설명형</span>
-        <h3>정보로 설득하는 글</h3>
-        <p style="font-size:15px;color:var(--t-body)">지점의 서비스·강점·이용 방법을 체계적으로 정리. 처음 알리는 지점, 정보 전달이 중요한 경우에 적합.</p>
-        <ul>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>지점 핵심 강점 구조화</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>검색 키워드 자연 배치</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>신규 고객 정보 탐색에 강함</li>
-        </ul>
+<!-- 정가 vs 한정가 -->
+<section class="sec">
+  <div class="wrap">
+    <p class="sec-eyb">Limited price</p>
+    <h2 class="sec-h">원장님이라서 <span class="hl">가능한 가격</span></h2>
+    <p class="sec-sub">일반 신청가의 3분의 1. 이 링크에서만 적용됩니다.</p>
+    <div class="vs">
+      <div class="vs-col a">
+        <div class="vs-tag">정가</div>
+        <div class="vs-amt">300,000<small>원</small></div>
+        <div class="vs-note">일반 신청가</div>
       </div>
-      <div class="type">
-        <span class="tag">B타입 · 후기형</span>
-        <h3>경험으로 공감시키는 글</h3>
-        <p style="font-size:15px;color:var(--t-body)">실제 이용 경험처럼 풀어내 신뢰를 형성. 전환·방문 유도가 목적인 경우에 적합.</p>
-        <ul>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>생생한 경험 서술 톤</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>방문·문의 전환 유도</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>신뢰·공감 형성에 강함</li>
-        </ul>
+      <div class="vs-col b">
+        <div class="vs-tag">원장님 한정</div>
+        <div class="vs-amt">100,000<small>원</small></div>
+        <div class="vs-note">VAT 별도 · 1회</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PROCESS -->
-<section id="process" class="dark">
-  <div class="wrap center">
-    <span class="eyebrow">Process</span>
-    <h2 class="sec-title">신청부터 발행까지 <span class="hl">4단계</span></h2>
-    <p class="sec-sub">번거로운 건 저희가, 결정만 사장님이.</p>
-    <div class="steps">
-      <div class="step"><div class="n">STEP 01</div><h3>신청 · 결제</h3><p>한정가로 신청서를 제출합니다.</p></div>
-      <div class="step"><div class="n">STEP 02</div><h3>키워드 제출</h3><p>타깃 키워드 1~3개와 글 타입(A/B)을 선택합니다.</p></div>
-      <div class="step"><div class="n">STEP 03</div><h3>전문 작성</h3><p>에디터가 검색 의도에 맞춰 글을 작성합니다.</p></div>
-      <div class="step"><div class="n">STEP 04</div><h3>발행 · 안내</h3><p>고방 공식 블로그에 발행 후 링크를 전달합니다.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- COMPARE -->
-<section id="compare">
-  <div class="wrap center">
-    <span class="eyebrow">가성비 증명</span>
-    <h2 class="sec-title">시장 단가와 비교하면</h2>
-    <p class="sec-sub">같은 결과물, 다른 가격. 기존 고객이라 가능한 한정가입니다.</p>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>항목</th>
-            <th>일반 블로그 대행</th>
-            <th class="col-hi">고방 한정가</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>1건 작성 단가</td><td>200,000~400,000원</td><td class="col-hi">100,000원 (VAT 별도)</td></tr>
-          <tr><td>채널 영향력</td><td>신규/저지수 블로그 다수</td><td class="col-hi">월 17만 방문 공식 블로그</td></tr>
-          <tr><td>VIEW탭 노출</td><td class="cross">불확실</td><td class="col-hi"><span class="check">상위노출 목표 설계</span></td></tr>
-          <tr><td>키워드 지정</td><td class="cross">제한적</td><td class="col-hi"><span class="check">1~3개 직접 제출</span></td></tr>
-          <tr><td>발행 기간</td><td>2~4주</td><td class="col-hi">영업일 7일 내</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p style="margin-top:22px;font-size:15px;color:var(--t-cap)">표기 금액은 모두 공급가 기준(VAT 별도)입니다.</p>
-  </div>
-</section>
-
-<!-- PRICE -->
-<section id="price" style="background:#EAF4FC">
-  <div class="wrap center">
-    <span class="eyebrow">한정 혜택</span>
-    <h2 class="sec-title">기존 고객만의 <span class="hl-gold">67% 할인가</span></h2>
-    <p class="sec-sub">동일 지점 1회 한정. 마감 후에는 정가로 복귀합니다.</p>
-
-    <div class="price-card">
-      <span class="ribbon">기존 고객 한정 · 1회</span>
-      <div class="price-name">고방 공식 블로그 작성</div>
-      <div class="price2">
-        <span class="price-old">정가 300,000원</span>
-        <span class="price-now-row">
-          <span class="price-now">100,000<small>원</small></span>
-          <span class="disc-badge">67% OFF</span>
-        </span>
-        <span class="vat">VAT 별도</span>
-      </div>
-      <ul class="pc-features">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>고방 공식 블로그(월 17만 방문) 발행</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>네이버 VIEW탭 상위노출 목표 작성</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>타깃 키워드 1~3개 직접 제출</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>A·B 글 타입 선택 · 전문 에디터 대필</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>영업일 7일 내 발행 · 링크 전달</li>
-      </ul>
-      <a href="form.html" class="btn-primary applyLink" style="width:100%">
-        한정가로 신청하기
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section id="faq" style="background:#fff;border-top:1px solid var(--border)">
-  <div class="wrap center">
-    <span class="eyebrow">FAQ</span>
-    <h2 class="sec-title">자주 묻는 질문</h2>
-    <p class="sec-sub">궁금한 점을 미리 정리했습니다.</p>
-    <div class="faq" style="text-align:left">
-      <details open>
-        <summary>왜 이렇게 저렴한가요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
-        <div class="ans">기존 고객 감사 프로모션으로 정가 300,000원을 100,000원(VAT 별도)에 제공합니다. 동일 지점 1회 한정이며, 마감 후에는 정가로 복귀합니다.</div>
-      </details>
-      <details>
-        <summary>발행까지 얼마나 걸리나요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
-        <div class="ans">키워드 제출 완료 후 평균 영업일 7일 내 발행합니다. 발행이 완료되면 게시글 링크를 전달드립니다.</div>
-      </details>
-      <details>
-        <summary>키워드는 어떻게 정하나요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
-        <div class="ans">노출을 원하는 타깃 키워드 1~3개를 직접 제출해 주시면, 검색 의도에 맞게 글에 자연스럽게 배치합니다.</div>
-      </details>
-      <details>
-        <summary>A타입과 B타입 차이가 뭔가요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
-        <div class="ans">A타입(설명형)은 지점 정보·강점을 체계적으로 전달하는 글, B타입(후기형)은 실제 경험처럼 공감을 유도하는 글입니다. 홍보 목적에 맞게 하나를 선택하세요.</div>
-      </details>
-      <details>
-        <summary>상위노출이 보장되나요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
-        <div class="ans">네이버 VIEW탭 상위노출을 목표로 작성하지만, 검색 결과는 네이버 알고리즘에 따라 변동될 수 있어 순위를 100% 보장하지는 않습니다. 다만 월 17만 방문의 공식 블로그라는 강한 채널 기반에서 출발한다는 점이 핵심 강점입니다.</div>
-      </details>
-    </div>
-  </div>
-</section>
-
-<!-- FINAL CTA -->
+<!-- 마감 임박 CTA -->
 <section class="final">
   <div class="wrap">
-    <h2>지금이 가장 저렴한 순간입니다</h2>
-    <p>한정가 마감 후에는 정가 300,000원으로 복귀합니다.</p>
-    <div class="price2">
-      <span class="price-old">정가 300,000원</span>
-      <span class="price-now-row">
-        <span class="price-now">100,000<small>원</small></span>
-        <span class="disc-badge">67% OFF</span>
-      </span>
-      <span class="vat">VAT 별도 · 동일 지점 1회 한정</span>
-    </div>
-    <div>
-      <a href="form.html" class="btn-primary applyLink">
-        한정가로 신청하기
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </a>
-    </div>
+    <h2>지금이 <span class="pt">가장 싼 순간</span>입니다</h2>
+    <p>마감되면 정가 300,000원으로 돌아갑니다.</p>
+    <a href="form.html" class="cta applyLink" style="box-shadow:0 12px 30px rgba(0,0,0,.3)">
+      한정가로 신청하기
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+    <p class="cta-note" id="finalNote"></p>
   </div>
 </section>
 
-<footer>
-  <div class="wrap">© 고방 · 고방 공식 블로그 작성 서비스 (기존 고객 한정 프로모션) · 표기 금액은 공급가 기준(VAT 별도)</div>
-</footer>
+<footer>© 고방 · 기존 고객 한정 프로모션 · 표기 금액은 공급가(VAT 별도)</footer>
 
-<!-- STICKY BOTTOM CTA -->
+<!-- 스티키 하단 -->
 <div class="sticky">
-  <div class="wrap sticky-in">
-    <div class="sticky-price">
-      <span class="so">정가 300,000원</span>
-      <span class="sn">100,000원 <small>(VAT 별도) · 67% OFF</small></span>
+  <div class="sticky-in">
+    <div class="sticky-left">
+      <div class="sl-time" id="slTime">--:--:--</div>
+      <div class="sl-price">100,000원<small> (VAT 별도)</small></div>
     </div>
-    <div class="sticky-timer" id="stickyTimer" aria-live="polite">마감까지 --:--:--:--</div>
-    <a href="form.html" class="btn-primary applyLink">신청하기</a>
+    <a href="form.html" class="cta applyLink">신청하기</a>
   </div>
 </div>
 
 <script>
 (function(){
-  // ?from=YYYYMMDD 기준 7일 만료 관리
-  var params = new URLSearchParams(window.location.search);
+  var params = new URLSearchParams(location.search);
   var fromRaw = params.get('from');
-  var start;
+  var validFrom = fromRaw && /^\d{8}$/.test(fromRaw);
+
   function parseFrom(s){
-    if(!s || !/^\d{8}$/.test(s)) return null;
     var y=+s.slice(0,4), mo=+s.slice(4,6)-1, d=+s.slice(6,8);
     var dt=new Date(y,mo,d,0,0,0,0);
     return isNaN(dt.getTime())?null:dt;
   }
-  start = parseFrom(fromRaw) || new Date();
-  var deadline = new Date(start.getTime() + 7*24*60*60*1000); // +7일
+  var start = validFrom ? parseFrom(fromRaw) : new Date();
+  var deadline = new Date(start.getTime() + 7*86400000);
 
   // 신청 링크에 ?from= 전달
-  var fromParam = fromRaw && /^\d{8}$/.test(fromRaw) ? fromRaw : (function(){
+  var fp = validFrom ? fromRaw : (function(){
     var t=new Date();
     return ''+t.getFullYear()+String(t.getMonth()+1).padStart(2,'0')+String(t.getDate()).padStart(2,'0');
   })();
-  document.querySelectorAll('.applyLink').forEach(function(a){
-    a.setAttribute('href','form.html?from='+fromParam);
-  });
+  document.querySelectorAll('.applyLink').forEach(function(a){ a.href='form.html?from='+fp; });
 
-  var d=document.getElementById('d'),h=document.getElementById('h'),
-      m=document.getElementById('m'),s=document.getElementById('s'),
-      timerBox=document.getElementById('timer'),
-      sticky=document.getElementById('stickyTimer');
+  var cdD=document.getElementById('cdD'),cdH=document.getElementById('cdH'),
+      cdM=document.getElementById('cdM'),cdS=document.getElementById('cdS'),
+      cdGrid=document.getElementById('cdGrid'),
+      tbTime=document.getElementById('tbTime'),slTime=document.getElementById('slTime'),
+      tbWrap=document.getElementById('tbWrap');
 
   function pad(n){return String(n).padStart(2,'0');}
+
   function tick(){
-    var now=new Date();
-    var diff=deadline.getTime()-now.getTime();
+    var diff = deadline.getTime() - Date.now();
     if(diff<=0){
-      if(timerBox) timerBox.innerHTML='<div class="count-expired">한정가 신청이 마감되었습니다 — 현재는 정가로 안내됩니다</div>';
-      if(sticky) sticky.textContent='한정가 마감';
+      if(cdGrid) cdGrid.innerHTML='<div class="cd-expired">한정가 신청이 마감되었습니다</div>';
+      if(tbWrap) tbWrap.textContent='🔒 한정 특가가 마감되었습니다';
+      if(slTime) slTime.textContent='마감';
+      var hn=document.getElementById('heroNote'); if(hn) hn.textContent='이벤트가 종료되었습니다';
       return;
     }
-    var dd=Math.floor(diff/86400000);
-    var hh=Math.floor(diff%86400000/3600000);
-    var mm=Math.floor(diff%3600000/60000);
-    var ss=Math.floor(diff%60000/1000);
-    if(d){d.textContent=pad(dd);h.textContent=pad(hh);m.textContent=pad(mm);s.textContent=pad(ss);}
-    if(sticky) sticky.textContent='마감까지 '+pad(dd)+':'+pad(hh)+':'+pad(mm)+':'+pad(ss);
-    requestAnimationFrame(function(){});
+    var dd=Math.floor(diff/86400000),
+        hh=Math.floor(diff%86400000/3600000),
+        mm=Math.floor(diff%3600000/60000),
+        ss=Math.floor(diff%60000/1000);
+    if(cdD){cdD.textContent=pad(dd);cdH.textContent=pad(hh);cdM.textContent=pad(mm);cdS.textContent=pad(ss);}
+    var compact = dd>0 ? (dd+'일 '+pad(hh)+':'+pad(mm)+':'+pad(ss)) : (pad(hh)+':'+pad(mm)+':'+pad(ss));
+    if(tbTime) tbTime.textContent=compact;
+    if(slTime) slTime.textContent='⏳ '+compact;
+    var fn=document.getElementById('finalNote');
+    if(fn) fn.textContent='마감까지 '+compact;
   }
   tick();
   setInterval(tick,1000);
 })();
 </script>
-
 </body>
 </html>
