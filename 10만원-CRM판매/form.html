@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>블로그 신청서 — 고방 10만원 특가</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --pri:   #3182F6; --pri-h: #1B6CF2; --pri-50:#F0F6FF; --pri-100:#EEF3FF; --pri-200:#D6E6FF; --pri-300:#D0E2FF;
+      --teal:  #00A0B0; --teal-bg:rgba(0,160,176,.07); --teal-bd:rgba(0,160,176,.22);
+      --g900: #191F28; --g700: #4A5568; --g600: #4E5968; --g500: #8B95A1; --g400: #B0B8C1; --g300: #C4CBD4;
+      --bg:   #F2F4F6; --sur: #FFFFFF; --info: #F8FAFF; --bdr: #E5E8EB; --bdr-i: #D0E2FF;
+      --ok:   #00C73C; --ok-bg:#E8FBF0;
+      --err:  #F04452; --err-bg:#FFF0F2; --err-str:#D92B2B;
+      --f: 'Pretendard', -apple-system, sans-serif;
+    }
+    html, body { width: 100%; }
+    body { font-family: var(--f); background: var(--bg); min-height: 100vh; padding-top: 40px; padding-bottom: 90px; }
+
+    /* ── 레이아웃 ── */
+    .page { max-width: 480px; margin: 0 auto; }
+
+    /* ── D-DAY 바 ── */
+    #dbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 40px; background: var(--sur); border-bottom: 1px solid var(--bdr);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    }
+    .dbar-back { font-size: 13px; font-weight: 600; color: var(--pri); text-decoration: none; display: flex; align-items: center; gap: 4px; }
+    .dbar-mid  { display: flex; align-items: center; gap: 8px; }
+    .dbar-mid .dn { font-size: 15px; font-weight: 800; color: var(--teal); letter-spacing: -.3px; }
+    .dbar-mid .ds { font-size: 13px; font-weight: 500; color: var(--g500); }
+    .dbar-r    { width: 48px; }
+
+    /* ── 상태 배너 ── */
+    .status-banner { max-width: 480px; margin: 8px auto 0; padding: 0 0; }
+    .status-urgent { font-size: 13px; font-weight: 600; color: var(--err-str); background: var(--err-bg); border-radius: 8px; padding: 10px 16px; margin: 0 0; }
+
+    /* ── 섹션 ── */
+    .sec { background: var(--sur); margin-top: 8px; padding: 20px 20px 16px; }
+    .sec-title { font-size: 11px; font-weight: 700; color: var(--g500); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 14px; }
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label { font-size: 14px; font-weight: 600; color: var(--g900); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+    .field-label a { font-size: 12px; font-weight: 600; color: var(--pri); text-decoration: none; }
+
+    /* 안내 카드 */
+    .notice { background: var(--info); border: 1.5px solid var(--bdr-i); border-radius: 10px; padding: 14px 16px; }
+    .notice ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .notice li { font-size: 13px; color: var(--g700); line-height: 1.6; padding-left: 14px; position: relative; }
+    .notice li::before { content: '·'; position: absolute; left: 3px; color: var(--pri); font-weight: 700; }
+    .notice a { color: var(--pri); text-decoration: underline; }
+
+    /* 입력 */
+    input, textarea {
+      width: 100%; padding: 13px 15px;
+      border: 1.5px solid var(--bdr); border-radius: 10px;
+      font-size: 15px; font-family: var(--f); color: var(--g900);
+      background: var(--sur); outline: none; transition: border-color .15s; -webkit-appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: var(--g400); }
+    input:focus, textarea:focus { border-color: var(--pri); }
+    input.valid   { border-color: var(--ok); }
+    input.invalid { border-color: var(--err); }
+    textarea { resize: none; height: 100px; line-height: 1.6; }
+
+    .fb { font-size: 12px; margin-top: 6px; min-height: 16px; display: flex; align-items: flex-start; gap: 4px; flex-direction: column; }
+    .fb.ok       { color: var(--ok); }
+    .fb.error    { color: var(--err); }
+    .fb.checking { color: var(--g500); }
+    .fb-hint     { font-size: 12px; color: var(--g500); line-height: 1.6; margin-top: 2px; }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .char-count { font-size: 12px; color: var(--g400); text-align: right; margin-top: 6px; }
+
+    /* 지점 미리보기 */
+    .place-preview { display: none; margin-top: 12px; border: 1.5px solid var(--bdr); border-radius: 10px; overflow: hidden; }
+    .preview-loading { display: none; align-items: center; justify-content: center; height: 56px; gap: 8px; color: var(--g500); font-size: 13px; }
+    .place-preview.loading .preview-loading { display: flex; }
+    .spin { width: 16px; height: 16px; border: 2px solid var(--bdr); border-top-color: var(--pri); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .og-card { display: none; text-decoration: none; color: inherit; }
+    .place-preview.loaded .og-card { display: flex; }
+    .og-img { width: 80px; min-height: 80px; background: var(--bg); flex-shrink: 0; overflow: hidden; }
+    .og-img img { width: 100%; height: 100%; object-fit: cover; }
+    .og-body { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+    .og-host  { font-size: 11px; color: var(--g400); }
+    .og-title { font-size: 14px; font-weight: 600; color: var(--g900); line-height: 1.4; }
+    .og-desc  { font-size: 12px; color: var(--g500); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .preview-info { display: none; padding: 12px 16px; background: var(--info); border-top: 1px solid var(--bdr); }
+    .place-preview.loaded .preview-info { display: block; }
+    .preview-info-title { font-size: 12px; font-weight: 600; color: var(--pri); margin-bottom: 10px; }
+    .info-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .info-fields.single { grid-template-columns: 1fr; }
+    .info-field-label { font-size: 11px; font-weight: 600; color: var(--g500); margin-bottom: 4px; }
+    .info-fields input { padding: 10px 12px; font-size: 14px; border-radius: 8px; }
+
+    /* 키워드 */
+    .kw-item  { display: flex; align-items: flex-start; gap: 12px; }
+    .kw-num   { width: 26px; height: 26px; border-radius: 50%; background: var(--bg); color: var(--g500); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 14px; }
+    .kw-num.active   { background: var(--pri-100); color: var(--pri); }
+    .kw-num.ok       { background: var(--ok-bg);   color: var(--ok); }
+    .kw-num.invalid  { background: var(--err-bg);  color: var(--err); }
+    .kw-body { flex: 1; }
+
+    /* 템플릿 */
+    .tmpl-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .tmpl-help   { font-size: 13px; color: var(--pri); cursor: pointer; font-weight: 500; text-decoration: underline; }
+    .tmpl-cards  { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .tmpl-card   { border: 2px solid var(--bdr); border-radius: 12px; padding: 16px 14px; cursor: pointer; transition: border-color .15s, background .15s; background: var(--sur); }
+    .tmpl-card.on{ border-color: var(--pri); background: var(--pri-50); }
+    .tmpl-tag    { font-size: 11px; font-weight: 700; color: var(--pri); background: var(--pri-100); border-radius: 5px; padding: 2px 8px; display: inline-block; margin-bottom: 8px; }
+    .tmpl-card.on .tmpl-tag { background: var(--pri); color: #fff; }
+    .tmpl-card-title { font-size: 15px; font-weight: 700; color: var(--g900); margin-bottom: 4px; }
+    .tmpl-card-desc  { font-size: 12px; color: var(--g500); line-height: 1.5; }
+    .tmpl-card-eg    { display: inline-block; font-size: 12px; color: var(--pri); margin-top: 10px; cursor: pointer; text-decoration: underline; font-weight: 500; }
+
+    /* 동의 토글 */
+    .agree-row { display: flex; align-items: center; gap: 12px; cursor: pointer; background: var(--info); border: 1.5px solid var(--bdr-i); border-radius: 10px; padding: 14px 16px; }
+    .agree-text{ font-size: 13px; color: var(--g700); line-height: 1.5; flex: 1; letter-spacing: -.2px; word-break: keep-all; }
+    .agree-text strong { color: var(--g900); }
+    .toggle { position: relative; width: 22px; height: 22px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-s { position: absolute; inset: 0; background: #fff; border: 2px solid var(--g300); border-radius: 5px; cursor: pointer; transition: background .15s, border-color .15s; }
+    .toggle-s::before { content: ''; position: absolute; width: 5px; height: 10px; left: 6px; top: 2px; border-right: 2.5px solid transparent; border-bottom: 2.5px solid transparent; transform: rotate(45deg); transition: border-color .15s; }
+    .toggle input:checked + .toggle-s { background: var(--pri); border-color: var(--pri); }
+    .toggle input:checked + .toggle-s::before { border-color: #fff; }
+
+    /* 하단 CTA */
+    .bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; padding: 12px 20px 16px; background: var(--sur); border-top: 1px solid var(--bdr); z-index: 100; }
+    button[type="submit"] { width: 100%; padding: 15px; background: var(--pri); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; font-family: var(--f); cursor: pointer; transition: background .15s; }
+    button[type="submit"]:hover:not(:disabled) { background: var(--pri-h); }
+    button[type="submit"]:disabled { background: var(--bdr); color: var(--g400); cursor: not-allowed; }
+
+    /* 비활성 / 완료 */
+    .off-screen { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; padding: 40px 20px; text-align: center; }
+    .off-screen h2 { font-size: 18px; font-weight: 700; color: var(--g900); margin-bottom: 8px; }
+    .off-screen p  { font-size: 14px; color: var(--g500); line-height: 1.6; }
+    .success { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; padding: 40px 20px; text-align: center; }
+    .success h2 { font-size: 20px; font-weight: 700; color: var(--g900); margin-bottom: 10px; }
+    .success p  { font-size: 15px; color: var(--g500); line-height: 1.7; }
+    .success-pay { display: inline-block; margin-top: 24px; padding: 16px 32px; background: var(--pri); color: #fff; border-radius: 12px; font-size: 17px; font-weight: 700; text-decoration: none; letter-spacing: -.3px; }
+    .success-pay:hover { background: var(--pri-h); }
+    .success-pay-note { font-size: 12px; color: var(--g400); margin-top: 10px; }
+
+    /* 모달 */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 300; align-items: flex-end; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal-sheet { background: var(--sur); border-radius: 20px 20px 0 0; padding: 28px 24px 32px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; animation: up .2s ease; }
+    @keyframes up { from { transform: translateY(100%); } }
+    .modal-title { font-size: 20px; font-weight: 700; color: var(--g900); margin-bottom: 6px; }
+    .modal-desc  { font-size: 15px; color: var(--g500); line-height: 1.6; margin-bottom: 16px; }
+    .modal-sum   { background: var(--info); border: 1.5px solid var(--bdr); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .sum-row     { display: flex; align-items: flex-start; gap: 8px; }
+    .sum-lbl     { font-size: 13px; color: var(--g500); font-weight: 500; min-width: 70px; flex-shrink: 0; }
+    .sum-val     { font-size: 13px; color: var(--g900); font-weight: 600; word-break: break-all; flex: 1; }
+    .modal-btns  { display: flex; flex-direction: column; gap: 8px; }
+    .btn-ok  { width: 100%; padding: 15px; background: var(--pri); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; font-family: var(--f); cursor: pointer; }
+    .btn-no  { width: 100%; padding: 15px; background: var(--bg); color: var(--g600); border: none; border-radius: 10px; font-size: 16px; font-weight: 600; font-family: var(--f); cursor: pointer; }
+
+    /* 템플릿 안내 모달 */
+    .tmpl-desc-list  { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .tmpl-desc-item  { border: 1.5px solid var(--bdr); border-radius: 10px; overflow: hidden; }
+    .tmpl-desc-head  { background: var(--info); padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--g900); display: flex; align-items: center; gap: 8px; }
+    .tmpl-desc-head-tag { font-size: 11px; font-weight: 700; color: #fff; background: var(--pri); border-radius: 5px; padding: 2px 8px; }
+    .tmpl-desc-body  { padding: 12px 16px; font-size: 14px; color: var(--g700); line-height: 1.7; }
+    .tmpl-eg-link    { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--bdr); }
+    .tmpl-eg-link a  { display: inline-block; font-size: 13px; font-weight: 600; color: var(--pri); text-decoration: none; background: var(--pri-100); border-radius: 8px; padding: 6px 14px; }
+
+    @media (max-width: 480px) {
+      .bottom-bar { left: 0; right: 0; transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- D-DAY 바 -->
+<div id="dbar">
+  <a href="./index.html" id="backLink" class="dbar-back">← 상세보기</a>
+  <div class="dbar-mid">
+    <span class="dn" id="dbarN"></span>
+    <span class="ds" id="dbarS"></span>
+  </div>
+  <div class="dbar-r"></div>
+</div>
+
+<!-- 비활성 화면 -->
+<div class="off-screen" id="offScreen">
+  <svg width="44" height="44" viewBox="0 0 20 20" fill="none" style="margin-bottom:16px;" aria-hidden="true">
+    <path fill="#C4CBD4" d="M10 2C7.24 2 5 4.24 5 7v2h2V7a3 3 0 0 1 6 0v2h2V7c0-2.76-2.24-5-5-5Z"/>
+    <rect x="3.5" y="9" width="13" height="9" rx="2" fill="#C4CBD4"/>
+  </svg>
+  <h2>신청을 받지 않고 있어요</h2>
+  <p id="offMsg"></p>
+</div>
+
+<!-- 성공 화면 -->
+<div class="success" id="successScreen">
+  <svg width="56" height="56" viewBox="0 0 20 20" fill="none" style="margin-bottom:20px;" aria-hidden="true">
+    <circle cx="10" cy="10" r="10" fill="#3182F6"/>
+    <path fill="#fff" d="M5.5 10.5L7.8 12.8L14.5 6L13.3 4.8L7.8 10.3L6.7 9.2Z"/>
+  </svg>
+  <h2>신청 접수 완료!</h2>
+  <p>결제 안내 알림톡을 확인해 주세요.<br>결제 완료 후 영업일 7일 내 발행돼요.</p>
+  <a href="https://s.tosspayments.com/BnxOr5SYbMi" target="_blank" rel="noopener" class="success-pay">결제하러 가기 →</a>
+  <div class="success-pay-note">토스·카카오페이·카드 (100,000원, VAT 별도)</div>
+</div>
+
+<!-- 메인 폼 -->
+<div id="formArea" style="display:none;">
+  <div class="page">
+
+    <!-- 상태 배너 -->
+    <div id="statusBanner" style="display:none; padding:8px 0 0;">
+      <div id="statusInner" class="status-urgent" style="margin:0 0;border-radius:0;"></div>
+    </div>
+
+    <form id="applyForm" novalidate>
+
+      <!-- 안내 -->
+      <div class="sec" style="margin-top:0;">
+        <div class="notice">
+          <ul>
+            <li>사진은 고방에 등록된 지점 사진만 사용됩니다. 추가는 <a href="https://u-ceo.kr/login" target="_blank">u-ceo.kr</a>에서 미리 올려 주세요.</li>
+            <li>접수 후 <strong>결제 안내 알림톡</strong>이 발송되며, 결제 완료 후 <strong>영업일 7일 내</strong> 발행됩니다.</li>
+            <li>동일 지점은 이벤트 기간 내 <strong>1회만</strong> 신청 가능합니다.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 신청자 정보 -->
+      <div class="sec">
+        <div class="sec-title">신청자 정보</div>
+        <div class="row">
+          <div class="field">
+            <div class="field-label">이름</div>
+            <input type="text" id="name" placeholder="홍길동" autocomplete="off">
+          </div>
+          <div class="field">
+            <div class="field-label">전화번호</div>
+            <input type="tel" id="phone" placeholder="010-0000-0000" maxlength="13" autocomplete="off">
+            <div class="fb" id="fb-phone"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 지점 정보 -->
+      <div class="sec">
+        <div class="sec-title">지점 정보</div>
+        <div class="field">
+          <div class="field-label">
+            지점 URL
+            <a href="https://gobang.kr" target="_blank" rel="noopener">고방 바로가기 →</a>
+          </div>
+          <input type="url" id="placeUrl" placeholder="https://gobang.kr/place/8102" autocomplete="off">
+          <div class="fb" id="fb-url"></div>
+          <div style="font-size:12px;color:var(--g400);margin-top:6px;">동일한 지점 URL로는 신청 기간 내 1회만 신청 가능합니다.</div>
+          <div class="place-preview" id="placePreview">
+            <div class="preview-loading">
+              <div class="spin"></div>지점 정보 불러오는 중...
+            </div>
+            <a class="og-card" id="ogCard" target="_blank" rel="noopener">
+              <div class="og-img" id="ogImgWrap"></div>
+              <div class="og-body">
+                <div class="og-host">gobang.kr</div>
+                <div class="og-title" id="ogTitle"></div>
+                <div class="og-desc"  id="ogDesc"></div>
+              </div>
+            </a>
+            <div class="preview-info" id="previewInfo">
+              <div class="preview-info-title">✦ 지점 정보 (다를 경우 직접 수정해 주세요)</div>
+              <div class="info-fields">
+                <div><div class="info-field-label">보증금</div><input type="text" id="deposit" placeholder="예: 50만원"></div>
+                <div><div class="info-field-label">월세</div><input type="text" id="monthly" placeholder="예: 40만원"></div>
+              </div>
+              <div class="info-fields single" style="margin-top:10px;">
+                <div><div class="info-field-label">도보 정보</div><input type="text" id="walking" placeholder="예: 강남역 도보 5분"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 키워드 -->
+      <div class="sec">
+        <div class="sec-title">키워드 · 최소 1개, 최대 3개</div>
+        <div style="background:var(--info);border:1.5px solid var(--bdr-i);border-radius:8px;padding:11px 14px;margin-bottom:14px;font-size:13px;color:var(--g700);line-height:1.6;">
+          띄어쓰기는 무시됩니다. <span style="color:var(--g500);">(예: '마포구고시원' = '마포구 고시원')</span>
+        </div>
+        <div class="field">
+          <div class="kw-item">
+            <div class="kw-num" id="kn-kw1">1</div>
+            <div class="kw-body">
+              <input type="text" id="kw1" placeholder="예: 마포구고시원" autocomplete="off">
+              <div class="fb" id="fb-kw1"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="kw-item">
+            <div class="kw-num" id="kn-kw2">2</div>
+            <div class="kw-body">
+              <input type="text" id="kw2" placeholder="선택 사항" autocomplete="off">
+              <div class="fb" id="fb-kw2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="kw-item">
+            <div class="kw-num" id="kn-kw3">3</div>
+            <div class="kw-body">
+              <input type="text" id="kw3" placeholder="선택 사항" autocomplete="off">
+              <div class="fb" id="fb-kw3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 템플릿 -->
+      <div class="sec">
+        <div class="tmpl-header">
+          <div class="sec-title" style="margin-bottom:0;">작성 템플릿</div>
+          <span class="tmpl-help" id="tmplHelp">유형 설명 보기</span>
+        </div>
+        <div class="tmpl-cards">
+          <div class="tmpl-card on" data-type="A">
+            <div class="tmpl-tag">A타입</div>
+            <div class="tmpl-card-title">설명형</div>
+            <div class="tmpl-card-desc">지점의 특징과<br>환경을 상세 설명</div>
+            <span class="tmpl-card-eg" data-type="A">예시 보기</span>
+          </div>
+          <div class="tmpl-card" data-type="B">
+            <div class="tmpl-tag">B타입</div>
+            <div class="tmpl-card-title">후기형</div>
+            <div class="tmpl-card-desc">실제 경험을<br>바탕으로 한 후기</div>
+            <span class="tmpl-card-eg" data-type="B">예시 보기</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 추가 정보 -->
+      <div class="sec">
+        <div class="sec-title">추가 정보</div>
+        <div class="field">
+          <div class="field-label">강조하고 싶은 내용</div>
+          <textarea id="description" placeholder="주차 가능, 조용한 분위기, 24시간 운영 등 강조할 내용을 적어주세요." maxlength="300"></textarea>
+          <div class="char-count"><span id="charCount">0</span>/300</div>
+        </div>
+      </div>
+
+      <!-- 동의 -->
+      <div class="sec" style="display:flex;flex-direction:column;gap:10px;">
+        <label class="agree-row" for="agree1">
+          <div class="toggle"><input type="checkbox" id="agree1"><span class="toggle-s"></span></div>
+          <span class="agree-text">입력하신 키워드로 <strong>네이버 블로그 탭 상단 노출</strong>을 목표로 작성되며, 알고리즘 특성상 <strong>노출 순위 및 유지 기간은 변동</strong>될 수 있음을 이해했습니다.</span>
+        </label>
+        <label class="agree-row" for="agree2">
+          <div class="toggle"><input type="checkbox" id="agree2"><span class="toggle-s"></span></div>
+          <span class="agree-text">신청 접수 후 <strong>결제 안내 알림톡</strong>이 발송되며, <strong>결제가 완료되어야 작업이 시작</strong>됩니다.</span>
+        </label>
+      </div>
+
+      <div style="height:20px;"></div>
+      <div class="bottom-bar">
+        <button type="submit" id="submitBtn" disabled>신청 접수하기</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 템플릿 모달 -->
+<div class="modal-overlay" id="tmplModal">
+  <div class="modal-sheet">
+    <div class="modal-title">템플릿 유형 안내</div>
+    <div class="modal-desc" style="margin-bottom:16px;">블로그 작성 방식을 선택해 주세요</div>
+    <div class="tmpl-desc-list">
+      <div class="tmpl-desc-item" id="td-A">
+        <div class="tmpl-desc-head"><span class="tmpl-desc-head-tag">A타입</span>설명형</div>
+        <div class="tmpl-desc-body">
+          <strong>객관적인 어투 + 정보전달 중심</strong>으로, 이 지점이 <strong>왜 좋은지 / 주변 대비 강점</strong>을 근거 있게 정리해요.<br><br>
+          가격·입실조건·시설·위치·편의시설처럼 <strong>비교 포인트를 구조화</strong>해서, 처음 보는 사람도 한 번에 파악하게 만드는 정보 정리형이에요.
+          <div class="tmpl-eg-link"><a href="https://blog.naver.com/neoflat1116/224260067840" target="_blank">예시 글 보기 →</a></div>
+        </div>
+      </div>
+      <div class="tmpl-desc-item" id="td-B">
+        <div class="tmpl-desc-head"><span class="tmpl-desc-head-tag">B타입</span>후기형</div>
+        <div class="tmpl-desc-body">
+          <strong>살았을 때의 느낌을 간접 체험</strong>하게, 후기형으로 자연스럽게 풀어줘요.<br><br>
+          동선·분위기·생활 체감 포인트를 디테일하게 묘사해서, <strong>어떤 생활이 펼쳐질지 감이 오게</strong> 만드는 스타일이에요.
+          <div class="tmpl-eg-link"><a href="https://blog.naver.com/neoflat1116/224260216013" target="_blank">예시 글 보기 →</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-btns"><button class="btn-no" id="tmplClose">확인</button></div>
+  </div>
+</div>
+
+<!-- 최종 확인 모달 -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-sheet">
+    <div style="font-size:32px;margin-bottom:14px;">📋</div>
+    <div class="modal-title">입력 내용 최종 확인</div>
+    <div class="modal-desc">신청 후에는 내용을 수정할 수 없어요.</div>
+    <div class="modal-sum" id="confirmSum"></div>
+    <div style="border:1.5px solid var(--bdr);border-radius:10px;margin-bottom:16px;">
+      <div style="background:var(--info);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-radius:10px 10px 0 0;" id="privacyHead">
+        <span style="font-size:13px;font-weight:600;color:var(--g900);">개인정보 수집 및 이용 동의 <span style="color:var(--err);">*필수</span></span>
+        <span style="font-size:11px;color:var(--g500);" id="privacyArrow">▶ 내용 보기</span>
+      </div>
+      <div style="display:none;padding:12px 14px;font-size:12px;color:var(--g700);line-height:1.7;border-top:1px solid var(--bdr);" id="privacyDetail">
+        <b>수집 항목</b> 이름, 휴대전화번호<br>
+        <b>수집 목적</b> 서비스 제공 및 신청 관리<br>
+        <b>보유 기간</b> 서비스 종료 후 즉시 파기<br>
+        <span style="color:var(--g500);">동의 거부 시 서비스 이용이 제한될 수 있습니다.</span>
+      </div>
+      <label id="privacyLabel" for="privacyAgree" style="display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;border-top:1px solid var(--bdr);">
+        <div class="toggle"><input type="checkbox" id="privacyAgree"><span class="toggle-s"></span></div>
+        <span class="agree-text">위 내용을 확인하였으며, 개인정보 수집 및 이용에 동의합니다.</span>
+      </label>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-ok" id="confirmOk" disabled style="opacity:.4;">동의하고 신청 완료하기</button>
+      <button class="btn-no" id="confirmCancel">돌아가기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbz20SjjyYfinAwwuNYAzPTHGGkFBWK4vJQ1BL0ZxJrwYjvcDdswE9wTWk73PgcnEFN-HA/exec';
+  var END_DATE = null;
+
+  (function() {
+    var p = new URLSearchParams(window.location.search);
+    var from = p.get('from');
+    if (from && /^\d{8}$/.test(from)) {
+      var d = from.slice(0,4) + '-' + from.slice(4,6) + '-' + from.slice(6,8);
+      END_DATE = new Date(new Date(d + 'T00:00:00+09:00').getTime() + 7 * 86400000);
+    }
+    // backLink에 ?from= 전달
+    var back = document.getElementById('backLink');
+    back.href = './index.html' + (from ? '?from=' + from : '');
+  })();
+
+  function isExpired() { return !END_DATE || new Date() > END_DATE; }
+
+  function updateDbar() {
+    var n = document.getElementById('dbarN'); var s = document.getElementById('dbarS');
+    if (!END_DATE || isExpired()) { n.textContent = ''; s.textContent = ''; return; }
+    var days = Math.ceil((END_DATE - new Date()) / 86400000);
+    n.textContent = days === 0 ? '오늘 마감' : 'D-' + days;
+    s.textContent = '· ' + days + '일 뒤 마감';
+  }
+  updateDbar(); setInterval(updateDbar, 60000);
+
+  function callAPI(action, params) {
+    return fetch(GAS_URL, { method: 'POST', body: JSON.stringify(Object.assign({ action: action }, params || {})) }).then(function(r){ return r.json(); });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    if (isExpired()) {
+      document.getElementById('offMsg').textContent = END_DATE ? '이 링크의 이벤트 기간이 만료됐어요.' : '유효하지 않은 링크예요.';
+      document.getElementById('offScreen').style.display = 'flex'; return;
+    }
+    document.getElementById('formArea').style.display = 'block';
+    callAPI('checkAccess').then(function(d) {
+      if (!d.ok) { document.getElementById('formArea').style.display = 'none'; document.getElementById('offMsg').textContent = d.reason; document.getElementById('offScreen').style.display = 'flex'; return; }
+      if (d.maxCount > 0) {
+        var rem = d.maxCount - d.currentCount;
+        if (rem <= 20) { document.getElementById('statusInner').innerHTML = '⚡ 남은 신청 가능 횟수 <strong>' + rem + '개</strong>'; document.getElementById('statusBanner').style.display = 'block'; }
+      }
+    }).catch(function(){});
+  });
+
+  /* ── 입력 처리 ── */
+  var kwStatus = { kw1: null, kw2: null, kw3: null };
+  var kwTimers = {}, urlTimer = null, urlCheckTimer = null;
+  var urlValid = false;
+
+  function setFb(id, type, msg, hint) {
+    var el = document.getElementById('fb-' + id);
+    el.className = 'fb ' + type;
+    el.innerHTML = msg ? '<span>' + msg + '</span>' + (hint ? '<span class="fb-hint">💡 ' + hint + '</span>' : '') : '';
+  }
+
+  function kwSuggest(kw) {
+    var map = [['고시원',['고시텔','원룸텔','1인실']],['원룸',['원룸텔','오피스텔']],['고시텔',['고시원','원룸텔']],['오피스텔',['원룸','원룸텔']]];
+    for (var i = 0; i < map.length; i++) { if (kw.indexOf(map[i][0]) !== -1) return '다른 키워드를 사용해보세요. 예) ' + map[i][1].map(function(t){ return '<strong>' + kw.replace(map[i][0], t) + '</strong>'; }).join(', '); }
+    return '다른 키워드를 사용해보세요. 예) <strong>' + kw + '추천</strong>, <strong>' + kw + '후기</strong>';
+  }
+
+  function setKn(id, cls) { document.getElementById('kn-' + id).className = 'kw-num' + (cls ? ' ' + cls : ''); }
+
+  document.getElementById('phone').addEventListener('input', function() {
+    var d = this.value.replace(/\D/g,'');
+    this.value = d.length <= 3 ? d : d.length <= 7 ? d.slice(0,3)+'-'+d.slice(3) : d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7,11);
+    var ok = /^010-\d{4}-\d{4}$/.test(this.value);
+    this.className = this.value ? (ok ? 'valid' : 'invalid') : '';
+    setFb('phone', ok || !this.value ? '' : 'error', ok || !this.value ? '' : '010-0000-0000 형식으로 입력해 주세요');
+    checkSubmit();
+  });
+
+  document.getElementById('placeUrl').addEventListener('input', function() {
+    var val = this.value.trim(); var ok = /^https:\/\/gobang\.kr\/place\/\d+$/.test(val);
+    urlValid = false; clearTimeout(urlCheckTimer);
+    var preview = document.getElementById('placePreview');
+    if (!val) { this.className = ''; setFb('url','',''); preview.style.display = 'none'; checkSubmit(); return; }
+    if (!ok) { this.className = 'invalid'; setFb('url','error','https://gobang.kr/place/숫자 형식으로 입력해 주세요'); preview.style.display = 'none'; checkSubmit(); return; }
+    this.className = ''; setFb('url','checking','확인 중...'); loadPlaceInfo(val);
+    var self = this;
+    urlCheckTimer = setTimeout(function() {
+      callAPI('checkPlaceUrl', { url: val }).then(function(r) {
+        if (self.value.trim() !== val) return;
+        if (r.error) { urlValid = false; self.className = 'invalid'; setFb('url','error','중복 확인 중 오류가 발생했어요.'); }
+        else if (r.available === false) { urlValid = false; self.className = 'invalid'; setFb('url','error','이미 신청된 지점이에요.'); }
+        else { urlValid = true; self.className = 'valid'; setFb('url','ok','신청 가능한 지점이에요'); }
+        checkSubmit();
+      }).catch(function(){ urlValid = false; self.className = 'invalid'; setFb('url','error','서버 연결 실패. 다시 시도해 주세요.'); checkSubmit(); });
+    }, 300);
+    checkSubmit();
+  });
+
+  function loadPlaceInfo(url) {
+    var p = document.getElementById('placePreview');
+    p.style.display = 'block'; p.className = 'place-preview loading';
+    document.getElementById('ogCard').href = url;
+    clearTimeout(urlTimer);
+    urlTimer = setTimeout(function() {
+      callAPI('fetchPlaceInfo', { url: url }).then(function(r) {
+        p.className = 'place-preview loaded';
+        if (r.ogTitle) document.getElementById('ogTitle').textContent = r.ogTitle;
+        if (r.ogDesc)  document.getElementById('ogDesc').textContent  = r.ogDesc;
+        if (r.ogImage) { var img = document.createElement('img'); img.src = r.ogImage; img.alt = ''; document.getElementById('ogImgWrap').innerHTML = ''; document.getElementById('ogImgWrap').appendChild(img); }
+        if (r.deposit) document.getElementById('deposit').value = r.deposit;
+        if (r.monthly) document.getElementById('monthly').value = r.monthly;
+        if (r.walking) document.getElementById('walking').value = r.walking;
+      }).catch(function() { p.className = 'place-preview loaded'; });
+    }, 400);
+  }
+
+  ['kw1','kw2','kw3'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', function() {
+      var val = this.value.trim(); kwStatus[id] = null; setKn(id,'');
+      if (!val) { this.className = ''; setFb(id,'',''); checkSubmit(); return; }
+      setKn(id,'active'); setFb(id,'checking','확인 중...'); this.className = '';
+      clearTimeout(kwTimers[id]);
+      var self = this;
+      kwTimers[id] = setTimeout(function() {
+        callAPI('checkKeyword', { keyword: val }).then(function(r) {
+          if (self.value.trim() !== val) return;
+          if (r.available) { kwStatus[id] = true; self.className = 'valid'; setKn(id,'ok'); setFb(id,'ok','사용 가능한 키워드예요'); }
+          else { kwStatus[id] = false; self.className = 'invalid'; setKn(id,'invalid'); setFb(id,'error', r.remainingDays + '일 뒤 사용 가능해요.', kwSuggest(val)); }
+          checkSubmit();
+        }).catch(function(){ setFb(id,'error','확인 중 오류가 발생했어요'); checkSubmit(); });
+      }, 300);
+    });
+  });
+
+  document.getElementById('name').addEventListener('input', checkSubmit);
+  document.getElementById('description').addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length; checkSubmit();
+  });
+  document.getElementById('agree1').addEventListener('change', checkSubmit);
+  document.getElementById('agree2').addEventListener('change', checkSubmit);
+
+  function checkSubmit() {
+    var ok = document.getElementById('name').value.trim().length >= 2
+      && /^010-\d{4}-\d{4}$/.test(document.getElementById('phone').value)
+      && urlValid === true
+      && document.getElementById('kw1').value.trim().length > 0 && kwStatus.kw1 === true
+      && (document.getElementById('kw2').value.trim().length === 0 || kwStatus.kw2 === true)
+      && (document.getElementById('kw3').value.trim().length === 0 || kwStatus.kw3 === true)
+      && document.getElementById('description').value.trim().length > 0
+      && document.getElementById('agree1').checked
+      && document.getElementById('agree2').checked;
+    document.getElementById('submitBtn').disabled = !ok;
+  }
+
+  /* 템플릿 */
+  var selTmpl = '10-A';
+  document.querySelectorAll('.tmpl-card').forEach(function(c) {
+    c.addEventListener('click', function() {
+      document.querySelectorAll('.tmpl-card').forEach(function(x){ x.classList.remove('on'); });
+      this.classList.add('on'); selTmpl = '10-' + this.getAttribute('data-type');
+    });
+  });
+  function openTmplModal(f) {
+    document.getElementById('td-A').style.display = (!f||f==='A') ? 'block' : 'none';
+    document.getElementById('td-B').style.display = (!f||f==='B') ? 'block' : 'none';
+    document.getElementById('tmplModal').classList.add('show');
+  }
+  document.getElementById('tmplHelp').addEventListener('click', function(){ openTmplModal(null); });
+  document.querySelectorAll('.tmpl-card-eg').forEach(function(b){ b.addEventListener('click', function(e){ e.stopPropagation(); openTmplModal(this.getAttribute('data-type')); }); });
+  document.getElementById('tmplClose').addEventListener('click', function(){ document.getElementById('tmplModal').classList.remove('show'); });
+
+  /* 개인정보 펼치기 */
+  document.getElementById('privacyHead').addEventListener('click', function() {
+    var d = document.getElementById('privacyDetail'); var open = d.style.display !== 'none';
+    d.style.display = open ? 'none' : 'block';
+    document.getElementById('privacyArrow').textContent = open ? '▶ 내용 보기' : '▼ 접기';
+  });
+  document.getElementById('privacyLabel').addEventListener('click', function(e){ e.stopPropagation(); setTimeout(function(){
+    var ok = document.getElementById('privacyAgree').checked;
+    document.getElementById('confirmOk').disabled = !ok; document.getElementById('confirmOk').style.opacity = ok ? '1' : '.4';
+  }, 0); });
+
+  /* 폼 제출 → 확인 모달 */
+  document.getElementById('applyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var rows = [
+      { l:'이름',      v: document.getElementById('name').value.trim() },
+      { l:'전화번호',  v: document.getElementById('phone').value.trim() },
+      { l:'지점 URL',  v: document.getElementById('placeUrl').value.trim() },
+      { l:'키워드',    v: [document.getElementById('kw1').value.trim(), document.getElementById('kw2').value.trim(), document.getElementById('kw3').value.trim()].filter(Boolean).join(' / ') },
+      { l:'작성 타입', v: selTmpl === '10-A' ? 'A타입 (설명형)' : 'B타입 (후기형)' },
+    ];
+    document.getElementById('confirmSum').innerHTML = rows.map(function(r){ return '<div class="sum-row"><span class="sum-lbl">'+r.l+'</span><span class="sum-val">'+r.v+'</span></div>'; }).join('');
+    document.getElementById('privacyAgree').checked = false;
+    document.getElementById('confirmOk').disabled = true; document.getElementById('confirmOk').style.opacity = '.4';
+    document.getElementById('privacyDetail').style.display = 'none';
+    document.getElementById('privacyArrow').textContent = '▶ 내용 보기';
+    document.getElementById('confirmModal').classList.add('show');
+  });
+
+  document.getElementById('confirmCancel').addEventListener('click', function(){ document.getElementById('confirmModal').classList.remove('show'); });
+
+  document.getElementById('confirmOk').addEventListener('click', function() {
+    document.getElementById('confirmModal').classList.remove('show');
+    var btn = document.getElementById('submitBtn'); btn.disabled = true; btn.textContent = '신청 중...';
+    callAPI('submitForm', {
+      name:         document.getElementById('name').value.trim(),
+      phone:        document.getElementById('phone').value.trim(),
+      placeUrl:     document.getElementById('placeUrl').value.trim(),
+      keyword1:     document.getElementById('kw1').value.trim(),
+      keyword2:     document.getElementById('kw2').value.trim(),
+      keyword3:     document.getElementById('kw3').value.trim(),
+      description:  document.getElementById('description').value.trim(),
+      deposit:      document.getElementById('deposit').value.trim(),
+      monthly:      document.getElementById('monthly').value.trim(),
+      walking:      document.getElementById('walking').value.trim(),
+      templateType: selTmpl,
+      source:       'v3'
+    }).then(function(r) {
+      if (r.success) { document.getElementById('formArea').style.display = 'none'; document.getElementById('successScreen').style.display = 'flex'; window.scrollTo(0,0); }
+      else { btn.disabled = false; btn.textContent = '신청 접수하기'; alert(r.reason === 'duplicate_url' ? '이미 신청된 지점 URL이에요.' : '오류가 발생했어요. 다시 시도해 주세요.'); }
+    }).catch(function(){ btn.disabled = false; btn.textContent = '신청 접수하기'; alert('오류가 발생했어요. 다시 시도해 주세요.'); });
+  });
+</script>
+</body>
+</html>
