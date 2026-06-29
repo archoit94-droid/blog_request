@@ -680,25 +680,42 @@
 </div>
 
 <script>
-  // ★ v3 GAS URL — 재배포 시 업데이트
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbz20SjjyYfinAwwuNYAzPTHGGkFBWK4vJQ1BL0ZxJrwYjvcDdswE9wTWk73PgcnEFN-HA/exec';
 
-  // ★ 이벤트 종료일 — 확정 후 수정 (예: new Date('2026-07-07T23:59:59+09:00'))
-  var END_DATE = new Date('2026-07-07T23:59:59+09:00');
+  // URL ?from=YYYYMMDD 파싱 → +7일이 종료일
+  var END_DATE = null;
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var from = params.get('from');
+    if (from && /^\d{8}$/.test(from)) {
+      var y = from.slice(0,4), m = from.slice(4,6), d = from.slice(6,8);
+      var start = new Date(y + '-' + m + '-' + d + 'T00:00:00+09:00');
+      END_DATE = new Date(start.getTime() + 7 * 86400000);
+    }
+  })();
+
+  function isExpired() {
+    return !END_DATE || new Date() > END_DATE;
+  }
+
+  function showExpired() {
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('offReason').textContent = '이 링크의 이벤트 기간이 만료됐어요. 다음 기회를 이용해 주세요.';
+    document.getElementById('offScreen').style.display = 'flex';
+    var bar = document.getElementById('countdown-bar');
+    bar.innerHTML = '<span style="font-size:15px;">이벤트 기간 만료</span>';
+    bar.style.background = '#6B7684';
+  }
 
   function updateCountdown() {
+    if (isExpired()) { showExpired(); return; }
     var bar = document.getElementById('countdown-bar');
     var msLeft = END_DATE - new Date();
-    if (msLeft <= 0) {
-      bar.innerHTML = '<span style="font-size:15px;">이벤트가 종료됐어요</span>';
-      bar.style.background = '#6B7684';
-      return;
-    }
     var days = Math.ceil(msLeft / 86400000);
     if (days === 0) {
       bar.innerHTML = '<span class="dday" style="color:#FBBF24;">오늘 마감!</span><span class="sub">자정에 종료돼요</span>';
     } else {
-      bar.innerHTML = '<span class="dday">D-' + days + '</span><span class="sub">· ' + days + '일 뒤 이벤트 마감 · 지금 바로 신청하세요</span>';
+      bar.innerHTML = '<span class="dday">D-' + days + '</span><span class="sub">· ' + days + '일 뒤 마감 · 지금 바로 신청하세요</span>';
     }
   }
   updateCountdown();
@@ -711,6 +728,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
+    if (isExpired()) { showExpired(); return; }
     document.getElementById('form-area').style.display = 'block';
 
     callAPI('checkAccess').then(function(data) {
