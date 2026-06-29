@@ -446,14 +446,21 @@
 
   function isExpired() { return !END_DATE || new Date() > END_DATE; }
 
+  function pad(n) { return String(n).padStart(2,'0'); }
   function updateDbar() {
     var n = document.getElementById('dbarN'); var s = document.getElementById('dbarS');
     if (!END_DATE || isExpired()) { n.textContent = ''; s.textContent = ''; return; }
-    var days = Math.ceil((END_DATE - new Date()) / 86400000);
+    var ms   = END_DATE - new Date();
+    var days = Math.floor(ms / 86400000);
+    var hrs  = Math.floor((ms % 86400000) / 3600000);
+    var mins = Math.floor((ms % 3600000)  / 60000);
+    var secs = Math.floor((ms % 60000)    / 1000);
     n.textContent = days === 0 ? '오늘 마감' : 'D-' + days;
-    s.textContent = '· ' + days + '일 뒤 마감';
+    s.textContent = days === 0
+      ? '· ' + pad(hrs) + ':' + pad(mins) + ':' + pad(secs) + ' 남음'
+      : '· ' + days + '일 ' + pad(hrs) + ':' + pad(mins) + ' 남음';
   }
-  updateDbar(); setInterval(updateDbar, 60000);
+  updateDbar(); setInterval(updateDbar, 1000);
 
   function callAPI(action, params) {
     return fetch(GAS_URL, { method: 'POST', body: JSON.stringify(Object.assign({ action: action }, params || {})) }).then(function(r){ return r.json(); });

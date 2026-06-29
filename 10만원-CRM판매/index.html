@@ -25,11 +25,30 @@
     /* ── D-DAY 바 ── */
     #dbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      height: 40px; background: var(--sur); border-bottom: 1px solid var(--bdr);
+      height: 40px; background: #FFF5F5; border-bottom: 1px solid #FFD6D6;
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    #dbar .dn  { font-size: 15px; font-weight: 800; color: var(--teal); letter-spacing: -.3px; }
-    #dbar .ds  { font-size: 13px; font-weight: 500; color: var(--g500); }
+    #dbar .dn  { font-size: 14px; font-weight: 800; color: #D92B2B; letter-spacing: -.3px; }
+    #dbar .ds  { font-size: 13px; font-weight: 500; color: #E05050; }
+
+    /* ── 히어로 카운트다운 블록 ── */
+    .countdown-block {
+      background: #FFF5F5; border: 1.5px solid #FFD6D6; border-radius: 12px;
+      padding: 14px 20px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .countdown-badge {
+      font-size: 11px; font-weight: 800; color: #fff; background: #D92B2B;
+      border-radius: 6px; padding: 3px 9px; flex-shrink: 0; letter-spacing: .3px;
+    }
+    .countdown-timer {
+      flex: 1; display: flex; align-items: baseline; gap: 4px;
+    }
+    .cd-unit { display: flex; flex-direction: column; align-items: center; min-width: 36px; }
+    .cd-num  { font-size: 24px; font-weight: 800; color: #D92B2B; letter-spacing: -1px; line-height: 1; font-variant-numeric: tabular-nums; }
+    .cd-lbl  { font-size: 10px; font-weight: 600; color: #E05050; margin-top: 2px; }
+    .cd-sep  { font-size: 20px; font-weight: 800; color: #D92B2B; padding-bottom: 4px; }
+    .countdown-msg { font-size: 12px; font-weight: 600; color: #D92B2B; flex-shrink: 0; }
 
     /* ── 섹션 공통 ── */
     .sec { background: var(--sur); margin-top: 8px; padding: 28px 20px; }
@@ -200,6 +219,22 @@
       <div class="eyebrow">기존 고객 한정 · 비공개 링크</div>
       <h1 class="hero-title">블로그 글 한 편,<br>지금 10만원</h1>
       <p class="hero-sub">정가 30만원 서비스를 기존 고객 대상으로<br>한시적으로 오픈합니다.</p>
+
+      <!-- 실시간 카운트다운 -->
+      <div class="countdown-block" id="cdBlock" style="display:none;">
+        <span class="countdown-badge">마감</span>
+        <div class="countdown-timer">
+          <div class="cd-unit"><span class="cd-num" id="cdD">00</span><span class="cd-lbl">일</span></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit"><span class="cd-num" id="cdH">00</span><span class="cd-lbl">시간</span></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit"><span class="cd-num" id="cdM">00</span><span class="cd-lbl">분</span></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-unit"><span class="cd-num" id="cdS">00</span><span class="cd-lbl">초</span></div>
+        </div>
+        <span class="countdown-msg" id="cdMsg"></span>
+      </div>
+
       <div class="price-card">
         <div class="price-row">
           <span class="price-lbl">정가</span>
@@ -464,25 +499,49 @@
   function isExpired() { return END_DATE && new Date() > END_DATE; }
   function noDate()    { return !END_DATE; }
 
-  function updateDbar() {
-    var n = document.getElementById('dbarN');
-    var s = document.getElementById('dbarS');
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function updateCountdown() {
+    var dbarN = document.getElementById('dbarN');
+    var dbarS = document.getElementById('dbarS');
+    var cdBlock = document.getElementById('cdBlock');
+
     if (noDate()) {
-      n.textContent = ''; s.textContent = '';
       document.getElementById('dbar').style.display = 'none';
       return;
     }
     if (isExpired()) {
-      n.textContent = '이벤트 종료'; n.style.color = 'var(--g400)'; s.textContent = '';
+      dbarN.textContent = '이벤트 종료'; dbarN.style.color = 'var(--g400)';
+      dbarS.textContent = '';
+      if (cdBlock) cdBlock.style.display = 'none';
       return;
     }
+
     var ms   = END_DATE - new Date();
-    var days = Math.ceil(ms / 86400000);
-    n.textContent = days === 0 ? '오늘 마감' : 'D-' + days;
-    s.textContent = '· ' + days + '일 뒤 마감됩니다';
+    var days = Math.floor(ms / 86400000);
+    var hrs  = Math.floor((ms % 86400000) / 3600000);
+    var mins = Math.floor((ms % 3600000)  / 60000);
+    var secs = Math.floor((ms % 60000)    / 1000);
+
+    // 상단 바
+    dbarN.textContent = days === 0 ? '오늘 마감' : 'D-' + days;
+    dbarS.textContent = days === 0
+      ? '· ' + pad(hrs) + ':' + pad(mins) + ':' + pad(secs) + ' 남음'
+      : '· ' + days + '일 ' + pad(hrs) + '시간 남음';
+
+    // 히어로 카운트다운 블록
+    if (cdBlock) {
+      cdBlock.style.display = 'flex';
+      document.getElementById('cdD').textContent = pad(days);
+      document.getElementById('cdH').textContent = pad(hrs);
+      document.getElementById('cdM').textContent = pad(mins);
+      document.getElementById('cdS').textContent = pad(secs);
+      var msg = days === 0 ? '오늘 자정 종료' : days + '일 후 종료';
+      document.getElementById('cdMsg').textContent = msg;
+    }
   }
-  updateDbar();
-  setInterval(updateDbar, 60000);
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
 
   function setupCta() {
     var heroCta   = document.getElementById('heroCta');
