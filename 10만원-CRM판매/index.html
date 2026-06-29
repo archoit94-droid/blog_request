@@ -1,590 +1,619 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>블로그 글 1편 — 10만원 기존 고객 특가 | 고방</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --pri:   #3182F6; --pri-h: #1B6CF2; --pri-50:#F0F6FF; --pri-100:#EEF3FF; --pri-200:#D6E6FF; --pri-300:#D0E2FF;
-      --teal:  #00A0B0; --teal-bg:rgba(0,160,176,.07); --teal-bd:rgba(0,160,176,.22);
-      --g900: #191F28; --g700: #4A5568; --g500: #8B95A1; --g400: #B0B8C1; --g300: #C4CBD4;
-      --bg:   #F2F4F6; --sur: #FFFFFF; --info: #F8FAFF; --bdr: #E5E8EB; --bdr-i: #D0E2FF;
-      --ok:   #00C73C; --err: #F04452;
-      --f: 'Pretendard', -apple-system, sans-serif;
-    }
-    html, body { width: 100%; }
-    body { font-family: var(--f); background: var(--bg); color: var(--g900); min-height: 100vh; padding-top: 40px; padding-bottom: 88px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>고방 공식 블로그 작성 서비스 · 기존 고객 한정가</title>
+<style>
+  :root{
+    --navy:#1A3A6B; --navy-deep:#0F2548;
+    --primary:#2B85CC; --primary-hover:#1E6FA8;
+    --accent:#2B85CC; --sky:#7FC0F0;
+    --gold:#E8B84B; --gold-text:#B0801E;
+    --bg:#F8FAFC; --surface:#FFFFFF;
+    --t-title:#1A202C; --t-body:#4A5568; --t-cap:#718096;
+    --border:#E2E8F0; --ok:#00C73C; --err:#F04452;
+    --danger:#E0162B;
+    --r-sm:8px; --r-md:12px; --r-lg:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    background:var(--bg); color:var(--t-body);
+    font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  h1,h2,h3{color:var(--t-title);font-weight:700;line-height:1.3}
+  section{padding:80px 0}
+  .center{text-align:center}
+  .eyebrow{
+    display:inline-block;font-size:14px;font-weight:600;letter-spacing:.04em;
+    color:var(--primary);text-transform:uppercase;margin-bottom:14px;
+  }
+  .sec-title{font-size:32px;margin-bottom:14px}
+  .sec-sub{font-size:18px;color:var(--t-body);max-width:620px;margin:0 auto}
+  .hl{
+    color:var(--primary);font-weight:800;
+    background:linear-gradient(180deg,transparent 60%,rgba(43,133,204,.22) 60%);
+    padding:0 2px;
+  }
+  .hl-gold{
+    color:var(--gold-text);font-weight:800;
+    background:linear-gradient(180deg,transparent 60%,rgba(232,184,75,.28) 60%);
+    padding:0 2px;
+  }
 
-    /* ── 레이아웃 래퍼 ── */
-    .wrap { max-width: 480px; margin: 0 auto; }
+  /* NAV */
+  .nav{
+    position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
+  }
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;color:var(--navy)}
+  .logo-mark{
+    width:30px;height:30px;border-radius:8px;
+    background:linear-gradient(135deg,var(--primary),var(--navy));
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;
+  }
+  .nav-menu{display:flex;gap:28px;font-size:15px;font-weight:500}
+  .nav-menu a{color:var(--t-body);transition:color .15s}
+  .nav-menu a:hover{color:var(--primary)}
+  .nav-cta{
+    background:var(--primary);color:#fff;font-weight:700;font-size:15px;
+    padding:10px 20px;border-radius:var(--r-sm);transition:background .15s;
+  }
+  .nav-cta:hover{background:var(--primary-hover)}
+  .nav-cta:focus-visible,a:focus-visible,button:focus-visible{
+    outline:3px solid rgba(43,133,204,.45);outline-offset:2px
+  }
 
-    /* ── D-DAY 바 ── */
-    #dbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      height: 40px; background: #FFF5F5; border-bottom: 1px solid #FFD6D6;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    #dbar .dn  { font-size: 14px; font-weight: 800; color: #D92B2B; letter-spacing: -.3px; }
-    #dbar .ds  { font-size: 13px; font-weight: 500; color: #E05050; }
+  /* HERO */
+  .hero{
+    background:linear-gradient(180deg,#FFFFFF 0%,#EAF4FC 100%);
+    padding:72px 0 88px;text-align:center;position:relative;overflow:hidden;
+  }
+  .badge-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;
+    padding:7px 14px;border-radius:999px;background:#fff;border:1px solid var(--border);color:var(--navy);
+  }
+  .chip.gold{background:#FFF8E8;border-color:#F0DCA6;color:var(--gold-text)}
+  .chip svg{width:15px;height:15px}
+  .hero h1{
+    font-size:48px;font-weight:800;letter-spacing:-.02em;line-height:1.25;
+    color:var(--navy-deep);margin-bottom:22px;
+  }
+  .hero p.lead{font-size:19px;color:var(--t-body);max-width:580px;margin:0 auto 34px}
 
-    /* ── 히어로 카운트다운 블록 ── */
-    .countdown-block {
-      background: #FFF5F5; border: 1.5px solid #FFD6D6; border-radius: 12px;
-      padding: 14px 20px; margin-bottom: 16px;
-      display: flex; align-items: center; gap: 12px;
-    }
-    .countdown-badge {
-      font-size: 11px; font-weight: 800; color: #fff; background: #D92B2B;
-      border-radius: 6px; padding: 3px 9px; flex-shrink: 0; letter-spacing: .3px;
-    }
-    .countdown-timer {
-      flex: 1; display: flex; align-items: baseline; gap: 4px;
-    }
-    .cd-unit { display: flex; flex-direction: column; align-items: center; min-width: 36px; }
-    .cd-num  { font-size: 24px; font-weight: 800; color: #D92B2B; letter-spacing: -1px; line-height: 1; font-variant-numeric: tabular-nums; }
-    .cd-lbl  { font-size: 10px; font-weight: 600; color: #E05050; margin-top: 2px; }
-    .cd-sep  { font-size: 20px; font-weight: 800; color: #D92B2B; padding-bottom: 4px; }
-    .countdown-msg { font-size: 12px; font-weight: 600; color: #D92B2B; flex-shrink: 0; }
+  /* COUNTDOWN */
+  .count-box{
+    display:inline-block;background:#fff;border:1px solid #F4C0C5;
+    border-radius:var(--r-lg);padding:22px 30px;margin:0 auto 36px;
+    box-shadow:0 8px 30px rgba(224,22,43,.10);
+  }
+  .count-label{
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    font-size:14px;font-weight:700;color:var(--danger);margin-bottom:14px;
+  }
+  .count-label svg{width:17px;height:17px}
+  .count-timer{display:flex;gap:10px;justify-content:center;align-items:flex-start}
+  .ct-unit{display:flex;flex-direction:column;align-items:center;min-width:62px}
+  .ct-num{
+    font-size:38px;font-weight:800;color:var(--danger);
+    font-variant-numeric:tabular-nums;line-height:1;
+    background:#FFF1F2;border-radius:var(--r-sm);padding:12px 10px;min-width:62px;
+  }
+  .ct-cap{font-size:12px;font-weight:600;color:var(--t-cap);margin-top:8px}
+  .ct-sep{font-size:32px;font-weight:800;color:#F4C0C5;line-height:1.6}
+  .count-expired{font-size:17px;font-weight:700;color:var(--danger);padding:6px 0}
 
-    /* ── 섹션 공통 ── */
-    .sec { background: var(--sur); margin-top: 8px; padding: 28px 20px; }
-    .sec:first-child { margin-top: 0; }
-    .eyebrow {
-      display: inline-flex; align-items: center;
-      font-size: 11px; font-weight: 700; color: var(--teal); letter-spacing: .2px;
-      background: var(--teal-bg); border: 1px solid var(--teal-bd); border-radius: 100px;
-      padding: 4px 12px; margin-bottom: 14px;
-    }
-    .sec-label {
-      font-size: 11px; font-weight: 700; color: var(--g500); letter-spacing: .5px;
-      text-transform: uppercase; margin-bottom: 16px;
-    }
-    .sec-title { font-size: 22px; font-weight: 800; color: var(--g900); line-height: 1.3; letter-spacing: -.6px; margin-bottom: 8px; }
-    .sec-desc  { font-size: 14px; color: var(--g700); line-height: 1.7; margin-bottom: 20px; }
+  /* PRICE BLOCK (shared 2-line pattern) */
+  .price2{display:inline-flex;flex-direction:column;align-items:center;gap:2px}
+  .price-old{font-size:19px;color:var(--t-cap);text-decoration:line-through;font-weight:500}
+  .price-now-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;justify-content:center}
+  .price-now{font-size:42px;font-weight:800;color:var(--navy-deep);letter-spacing:-.02em}
+  .price-now small{font-size:18px;font-weight:700}
+  .disc-badge{
+    background:var(--danger);color:#fff;font-size:15px;font-weight:800;
+    padding:5px 12px;border-radius:999px;align-self:center;
+  }
+  .vat{font-size:14px;color:var(--t-cap);font-weight:500;margin-top:4px}
 
-    /* ── 히어로 ── */
-    .hero { background: var(--sur); padding: 32px 20px 28px; }
-    .hero-title { font-size: 30px; font-weight: 800; color: var(--g900); line-height: 1.25; letter-spacing: -.9px; margin-bottom: 6px; }
-    .hero-sub   { font-size: 15px; color: var(--g500); margin-bottom: 22px; line-height: 1.6; }
+  /* CTA buttons */
+  .btn-primary{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    background:linear-gradient(135deg,var(--primary),var(--navy));
+    color:#fff;font-size:18px;font-weight:700;
+    padding:18px 40px;border-radius:var(--r-md);border:none;cursor:pointer;
+    min-height:44px;transition:transform .2s,box-shadow .2s;
+    box-shadow:0 10px 26px rgba(43,133,204,.32);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(43,133,204,.42)}
+  .btn-primary svg{width:20px;height:20px}
+  .hero-cta-note{margin-top:14px;font-size:14px;color:var(--t-cap)}
 
-    .price-card { background: var(--info); border: 1.5px solid var(--bdr-i); border-radius: 14px; padding: 18px 20px; margin-bottom: 20px; }
-    .price-row  { display: flex; align-items: baseline; justify-content: space-between; padding: 3px 0; }
-    .price-row + .price-row { border-top: 1px dashed var(--bdr); margin-top: 10px; padding-top: 12px; }
-    .price-lbl  { font-size: 13px; font-weight: 600; color: var(--g500); }
-    .price-ori  { font-size: 16px; font-weight: 500; color: var(--g400); text-decoration: line-through; }
-    .price-now  { font-size: 32px; font-weight: 800; color: var(--pri); letter-spacing: -1px; }
-    .price-note { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--bdr); font-size: 12px; color: var(--g400); line-height: 1.6; }
+  /* METRICS */
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:54px}
+  .metric{
+    background:#fff;border:1px solid var(--border);border-radius:var(--r-md);
+    padding:26px 18px;text-align:center;
+  }
+  .metric .num{font-size:34px;font-weight:800;color:var(--primary);letter-spacing:-.02em}
+  .metric .lab{font-size:14px;color:var(--t-body);margin-top:6px;font-weight:500}
 
-    /* ── 히어로 CTA ── */
-    .hero-cta {
-      display: block; width: 100%; padding: 16px; text-align: center;
-      background: var(--pri); color: #fff; border-radius: 12px;
-      font-size: 17px; font-weight: 700; text-decoration: none;
-      letter-spacing: -.3px; transition: background .15s;
-    }
-    .hero-cta:hover { background: var(--pri-h); }
-    .hero-cta-note { text-align: center; font-size: 12px; color: var(--g400); margin-top: 8px; }
+  /* generic grid cards */
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:48px}
+  .card{
+    background:#fff;border:1px solid var(--border);border-radius:var(--r-md);
+    padding:30px 26px;text-align:left;transition:transform .2s,box-shadow .2s;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(26,58,107,.08)}
+  .ic{
+    width:46px;height:46px;border-radius:12px;background:#EAF4FC;
+    display:flex;align-items:center;justify-content:center;margin-bottom:18px;
+  }
+  .ic svg{width:24px;height:24px;stroke:var(--primary)}
+  .card h3{font-size:19px;margin-bottom:10px}
+  .card p{font-size:15px;color:var(--t-body)}
 
-    /* ── 타겟 리스트 ── */
-    .target-list { display: flex; flex-direction: column; gap: 10px; }
-    .target-item {
-      display: flex; align-items: flex-start; gap: 12px;
-      background: var(--bg); border-radius: 10px; padding: 14px 16px;
-    }
-    .target-dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-    .target-text { font-size: 14px; font-weight: 600; color: var(--g900); line-height: 1.5; }
-    .target-sub  { font-size: 13px; color: var(--g500); margin-top: 3px; line-height: 1.5; }
+  .dark{background:linear-gradient(160deg,var(--navy),var(--navy-deep));color:#E2EAF4}
+  .dark .sec-title{color:#fff}
+  .dark .sec-sub{color:#BBD0EA}
+  .dark .eyebrow{color:var(--sky)}
+  .dark .hl{color:var(--sky);background:linear-gradient(180deg,transparent 60%,rgba(127,192,240,.28) 60%)}
 
-    /* ── 혜택 리스트 ── */
-    .benefit-list { display: flex; flex-direction: column; gap: 0; }
-    .benefit-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--bdr); }
-    .benefit-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .benefit-icon {
-      width: 36px; height: 36px; background: var(--pri-100); border-radius: 8px;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .benefit-t { font-size: 14px; font-weight: 700; color: var(--g900); margin-bottom: 3px; }
-    .benefit-d { font-size: 13px; color: var(--g700); line-height: 1.6; }
+  /* STEPS */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:48px}
+  .step{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--r-md);padding:26px 22px}
+  .step .n{font-size:14px;font-weight:800;color:var(--sky);letter-spacing:.05em;margin-bottom:12px}
+  .step h3{color:#fff;font-size:17px;margin-bottom:8px}
+  .step p{font-size:14px;color:#BBD0EA}
 
-    /* ── 프로세스 ── */
-    .process-list { display: flex; flex-direction: column; gap: 0; }
-    .process-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; position: relative; }
-    .process-item:not(:last-child)::after {
-      content: ''; position: absolute; left: 17px; top: 50px; bottom: 0;
-      width: 2px; background: var(--bdr); border-radius: 1px;
-    }
-    .process-num {
-      width: 36px; height: 36px; border-radius: 50%; background: var(--pri);
-      color: #fff; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; z-index: 1;
-    }
-    .process-t { font-size: 15px; font-weight: 700; color: var(--g900); margin-bottom: 4px; }
-    .process-d { font-size: 13px; color: var(--g700); line-height: 1.6; }
-    .process-badge {
-      display: inline-block; font-size: 11px; font-weight: 700; color: var(--pri);
-      background: var(--pri-100); border-radius: 5px; padding: 2px 8px; margin-top: 6px;
-    }
+  /* COMPARE TABLE */
+  .tbl-wrap{margin-top:48px;overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border)}
+  table{width:100%;border-collapse:collapse;background:#fff;min-width:560px}
+  th,td{padding:16px 18px;text-align:center;font-size:15px;border-bottom:1px solid var(--border)}
+  th{background:var(--navy);color:#fff;font-weight:700;font-size:15px}
+  td:first-child,th:first-child{text-align:left;font-weight:600;color:var(--t-title)}
+  tr:last-child td{border-bottom:none}
+  .col-hi{background:#EAF4FC}
+  td.col-hi{font-weight:700;color:var(--navy)}
+  .check{color:var(--ok);font-weight:800}
+  .cross{color:var(--t-cap)}
 
-    /* ── 예시 카드 ── */
-    .example-cards { display: flex; flex-direction: column; gap: 10px; }
-    .example-card {
-      border: 1.5px solid var(--bdr); border-radius: 12px; overflow: hidden;
-      text-decoration: none; color: inherit; display: block; transition: border-color .15s;
-    }
-    .example-card:hover { border-color: var(--pri); }
-    .example-card-head {
-      background: var(--pri-100); padding: 12px 16px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .example-tag { font-size: 11px; font-weight: 700; color: #fff; background: var(--pri); border-radius: 5px; padding: 3px 9px; }
-    .example-title { font-size: 14px; font-weight: 700; color: var(--g900); }
-    .example-card-body { padding: 12px 16px; font-size: 13px; color: var(--g700); line-height: 1.7; }
-    .example-link { display: flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--pri); }
+  /* TYPE CARDS */
+  .type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:48px}
+  .type{background:#fff;border:2px solid var(--border);border-radius:var(--r-lg);padding:34px 30px;text-align:left}
+  .type .tag{display:inline-block;font-size:13px;font-weight:800;color:#fff;background:var(--primary);padding:5px 14px;border-radius:999px;margin-bottom:16px}
+  .type:nth-child(2) .tag{background:var(--navy)}
+  .type h3{font-size:22px;margin-bottom:8px}
+  .type ul{list-style:none;margin-top:16px}
+  .type li{display:flex;gap:10px;align-items:flex-start;font-size:15px;margin-bottom:10px;color:var(--t-body)}
+  .type li svg{width:18px;height:18px;stroke:var(--primary);flex-shrink:0;margin-top:3px}
 
-    /* ── FAQ ── */
-    .faq-list { display: flex; flex-direction: column; gap: 0; }
-    .faq-item { border-bottom: 1px solid var(--bdr); }
-    .faq-item:last-child { border-bottom: none; }
-    .faq-q {
-      width: 100%; background: none; border: none; padding: 16px 0;
-      display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
-      font-family: var(--f); text-align: left;
-    }
-    .faq-mark { font-size: 13px; font-weight: 800; color: var(--pri); width: 18px; flex-shrink: 0; padding-top: 1px; }
-    .faq-qtext{ font-size: 14px; font-weight: 600; color: var(--g900); flex: 1; line-height: 1.5; }
-    .faq-plus { font-size: 20px; color: var(--g400); margin-left: 4px; transition: transform .2s; flex-shrink: 0; }
-    .faq-plus.open { transform: rotate(45deg); }
-    .faq-a { overflow: hidden; display: grid; grid-template-rows: 0fr; transition: grid-template-rows .2s; }
-    .faq-a.open { grid-template-rows: 1fr; }
-    .faq-a-inner > div { padding: 0 0 16px 28px; font-size: 14px; color: var(--g700); line-height: 1.7; }
-    .faq-a-inner > div a { color: var(--pri); }
+  /* PRICE SECTION */
+  .price-card{
+    max-width:520px;margin:48px auto 0;background:#fff;border:1px solid var(--border);
+    border-radius:var(--r-lg);padding:44px 38px;text-align:center;
+    box-shadow:0 16px 40px rgba(26,58,107,.10);position:relative;
+  }
+  .price-card .ribbon{
+    position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+    background:var(--gold);color:#fff;font-size:13px;font-weight:800;
+    padding:7px 18px;border-radius:999px;white-space:nowrap;
+  }
+  .price-name{font-size:20px;font-weight:700;color:var(--navy);margin:10px 0 22px}
+  .price-card .price2{margin-bottom:26px}
+  .pc-features{text-align:left;margin:0 0 28px;list-style:none}
+  .pc-features li{display:flex;gap:10px;align-items:flex-start;font-size:15px;margin-bottom:12px}
+  .pc-features li svg{width:18px;height:18px;stroke:var(--ok);flex-shrink:0;margin-top:3px}
 
-    /* ── 하단 고정 CTA ── */
-    .bottom-bar {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 480px;
-      padding: 12px 20px 16px;
-      background: var(--sur); border-top: 1px solid var(--bdr);
-      z-index: 90;
-    }
-    .bottom-cta {
-      display: block; width: 100%; padding: 15px; text-align: center;
-      background: var(--pri); color: #fff; border-radius: 10px;
-      font-size: 16px; font-weight: 700; text-decoration: none;
-      transition: background .15s;
-    }
-    .bottom-cta:hover { background: var(--pri-h); }
-    .bottom-cta.disabled {
-      background: var(--bdr); color: var(--g400); pointer-events: none;
-    }
+  /* FAQ */
+  .faq{max-width:760px;margin:48px auto 0}
+  details{background:#fff;border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:12px;overflow:hidden}
+  summary{
+    cursor:pointer;list-style:none;padding:20px 24px;font-size:17px;font-weight:600;color:var(--t-title);
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary .arr{transition:transform .2s;color:var(--primary);flex-shrink:0}
+  details[open] summary .arr{transform:rotate(180deg)}
+  details .ans{padding:0 24px 22px;font-size:15px;color:var(--t-body);line-height:1.7}
 
-    /* ── 만료 화면 ── */
-    .off { display:none; flex-direction:column; align-items:center; justify-content:center; min-height:80vh; padding:40px 20px; text-align:center; }
-    .off h2 { font-size:18px; font-weight:700; color:var(--g900); margin-bottom:8px; }
-    .off p  { font-size:14px; color:var(--g500); line-height:1.6; }
+  /* CTA FINAL */
+  .final{background:linear-gradient(160deg,var(--primary),var(--navy));text-align:center;color:#fff}
+  .final h2{color:#fff;font-size:34px;margin-bottom:14px}
+  .final p{color:#D6E8F8;font-size:18px;margin-bottom:30px}
+  .final .price2 .price-old{color:#9FC2E6}
+  .final .price2 .price-now{color:#fff}
+  .final .price2 .vat{color:#CFE2F5}
+  .final .btn-primary{background:#fff;color:var(--navy-deep);box-shadow:0 12px 30px rgba(0,0,0,.25);margin-top:26px}
+  .final .btn-primary:hover{background:#F0F6FC}
 
-    @media (max-width: 480px) {
-      .bottom-bar { left: 0; right: 0; transform: none; }
-    }
-  </style>
+  /* STICKY BOTTOM CTA */
+  .sticky{
+    position:fixed;bottom:0;left:0;right:0;z-index:60;
+    background:rgba(255,255,255,.97);backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);box-shadow:0 -4px 20px rgba(0,0,0,.07);
+    padding:12px 0;
+  }
+  .sticky-in{display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .sticky-price{display:flex;flex-direction:column;line-height:1.2}
+  .sticky-price .so{font-size:13px;color:var(--t-cap);text-decoration:line-through}
+  .sticky-price .sn{font-size:21px;font-weight:800;color:var(--navy-deep)}
+  .sticky-price .sn small{font-size:13px;font-weight:600;color:var(--t-cap)}
+  .sticky-timer{font-size:14px;font-weight:700;color:var(--danger);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .sticky .btn-primary{padding:14px 30px;font-size:16px;box-shadow:0 6px 18px rgba(43,133,204,.3)}
+  body{padding-bottom:84px}
+
+  footer{background:var(--navy-deep);color:#8FA6C4;text-align:center;padding:34px 0;font-size:13px}
+
+  @media (max-width:1024px){
+    .metrics{grid-template-columns:repeat(2,1fr)}
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .grid3{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:768px){
+    .nav-menu{display:none}
+    .hero h1{font-size:34px}
+    .sec-title{font-size:26px}
+    section{padding:60px 0}
+    .grid3,.type-grid{grid-template-columns:1fr}
+  }
+  @media (max-width:480px){
+    .hero h1{font-size:28px}
+    .metrics{grid-template-columns:1fr}
+    .steps{grid-template-columns:1fr}
+    .ct-num{font-size:30px;min-width:52px;padding:10px 6px}
+    .ct-unit{min-width:52px}
+    .price-now{font-size:34px}
+    .sticky-price .sn{font-size:18px}
+    .sticky-timer{display:none}
+    .sticky .btn-primary{padding:13px 20px;font-size:15px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  }
+</style>
 </head>
 <body>
 
-<!-- D-DAY 바 -->
-<div id="dbar">
-  <span class="dn" id="dbarN">—</span>
-  <span class="ds" id="dbarS"></span>
-</div>
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav-in">
+    <a href="#top" class="logo"><span class="logo-mark" aria-hidden="true">G</span>고방 블로그</a>
+    <div class="nav-menu">
+      <a href="#why">왜 고방인가</a>
+      <a href="#type">타입 선택</a>
+      <a href="#process">진행과정</a>
+      <a href="#compare">가성비</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <a href="#price" class="nav-cta">지금 신청</a>
+  </div>
+</nav>
 
-<!-- 만료 화면 -->
-<div class="off" id="offScreen">
-  <svg width="44" height="44" viewBox="0 0 20 20" fill="none" style="margin-bottom:16px;" aria-hidden="true">
-    <path fill="#C4CBD4" d="M10 2C7.24 2 5 4.24 5 7v2h2V7a3 3 0 0 1 6 0v2h2V7c0-2.76-2.24-5-5-5Z"/>
-    <rect x="3.5" y="9" width="13" height="9" rx="2" fill="#C4CBD4"/>
-  </svg>
-  <h2>이벤트가 종료됐어요</h2>
-  <p id="offMsg">이 링크의 이벤트 기간이 만료됐어요.</p>
-</div>
-
-<!-- 메인 콘텐츠 -->
-<div id="main" style="display:none;">
+<!-- HERO -->
+<header class="hero" id="top">
   <div class="wrap">
+    <div class="badge-row">
+      <span class="chip gold">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 17.3 5.7 21.4 8 14 2 9.4h7.6z"/></svg>
+        기존 고객 한정 프로모션
+      </span>
+      <span class="chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        동일 지점 1회 한정
+      </span>
+    </div>
 
-    <!-- 히어로 -->
-    <section class="hero">
-      <div class="eyebrow">기존 고객 한정 · 비공개 링크</div>
-      <h1 class="hero-title">블로그 글 한 편,<br>지금 10만원</h1>
-      <p class="hero-sub">정가 30만원 서비스를 기존 고객 대상으로<br>한시적으로 오픈합니다.</p>
+    <h1>
+      월 17만 명이 보는 고방 공식 블로그에<br>
+      <span class="hl">우리 지점 홍보글</span>이 올라갑니다<br>
+      네이버 VIEW탭 상위노출까지
+    </h1>
+    <p class="lead">전문 에디터가 영업일 7일 내 발행. 키워드는 직접 정하고, 글 타입만 고르세요.</p>
 
-      <!-- 실시간 카운트다운 -->
-      <div class="countdown-block" id="cdBlock" style="display:none;">
-        <span class="countdown-badge">마감</span>
-        <div class="countdown-timer">
-          <div class="cd-unit"><span class="cd-num" id="cdD">00</span><span class="cd-lbl">일</span></div>
-          <span class="cd-sep">:</span>
-          <div class="cd-unit"><span class="cd-num" id="cdH">00</span><span class="cd-lbl">시간</span></div>
-          <span class="cd-sep">:</span>
-          <div class="cd-unit"><span class="cd-num" id="cdM">00</span><span class="cd-lbl">분</span></div>
-          <span class="cd-sep">:</span>
-          <div class="cd-unit"><span class="cd-num" id="cdS">00</span><span class="cd-lbl">초</span></div>
-        </div>
-        <span class="countdown-msg" id="cdMsg"></span>
+    <!-- COUNTDOWN -->
+    <div class="count-box" role="timer" aria-live="polite">
+      <div class="count-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        한정가 마감까지
       </div>
-
-      <div class="price-card">
-        <div class="price-row">
-          <span class="price-lbl">정가</span>
-          <span class="price-ori">₩300,000</span>
-        </div>
-        <div class="price-row">
-          <span class="price-lbl" style="font-size:15px;font-weight:700;color:var(--g900);">지금</span>
-          <span class="price-now">₩100,000</span>
-        </div>
-        <div class="price-note">VAT 별도 · 영업일 7일 내 발행 · 동일 지점 1회</div>
+      <div class="count-timer" id="timer">
+        <div class="ct-unit"><span class="ct-num" id="d">00</span><span class="ct-cap">일</span></div>
+        <span class="ct-sep">:</span>
+        <div class="ct-unit"><span class="ct-num" id="h">00</span><span class="ct-cap">시간</span></div>
+        <span class="ct-sep">:</span>
+        <div class="ct-unit"><span class="ct-num" id="m">00</span><span class="ct-cap">분</span></div>
+        <span class="ct-sep">:</span>
+        <div class="ct-unit"><span class="ct-num" id="s">00</span><span class="ct-cap">초</span></div>
       </div>
-      <a href="#" id="heroCta" class="hero-cta">신청서 작성하기 →</a>
-      <p class="hero-cta-note" id="heroNote"></p>
-    </section>
+    </div>
 
-    <!-- 이런 분께 -->
-    <section class="sec">
-      <div class="sec-label">이런 지점에 추천해요</div>
-      <div class="target-list">
-        <div class="target-item">
-          <div class="target-dot"></div>
-          <div>
-            <div class="target-text">네이버 블로그 상위노출, 한 번도 안 해본 지점</div>
-            <div class="target-sub">경쟁사 대비 검색 노출이 없어 신규 문의가 적은 경우</div>
-          </div>
-        </div>
-        <div class="target-item">
-          <div class="target-dot"></div>
-          <div>
-            <div class="target-text">직접 쓰려다 시간이 없는 지점주</div>
-            <div class="target-sub">어떤 키워드로, 어떻게 써야 할지 막막한 경우</div>
-          </div>
-        </div>
-        <div class="target-item">
-          <div class="target-dot"></div>
-          <div>
-            <div class="target-text">성수기 전 노출을 미리 확보하고 싶은 지점</div>
-            <div class="target-sub">발행 후 검색 상위노출까지 통상 2~4주 소요</div>
-          </div>
-        </div>
+    <!-- HERO PRICE (2-line) -->
+    <div class="price2" style="margin-bottom:30px">
+      <span class="price-old">정가 300,000원</span>
+      <span class="price-now-row">
+        <span class="price-now">100,000<small>원</small></span>
+        <span class="disc-badge">67% OFF</span>
+      </span>
+      <span class="vat">VAT 별도 · 기존 고객 한정가</span>
+    </div>
+
+    <div>
+      <a href="#price" class="btn-primary" id="heroCta">
+        지금 한정가로 신청하기
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <p class="hero-cta-note">신청 후 키워드만 보내주시면 끝. 평균 영업일 7일 내 발행</p>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics">
+      <div class="metric"><div class="num">17만</div><div class="lab">고방 공식 블로그 월 방문</div></div>
+      <div class="metric"><div class="num">VIEW탭</div><div class="lab">네이버 상위노출 목표</div></div>
+      <div class="metric"><div class="num">7일</div><div class="lab">영업일 내 발행</div></div>
+      <div class="metric"><div class="num">1~3개</div><div class="lab">직접 정하는 타깃 키워드</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- WHY -->
+<section id="why">
+  <div class="wrap center">
+    <span class="eyebrow">Why 고방</span>
+    <h2 class="sec-title">왜 직접 쓰는 것보다 효과적일까요</h2>
+    <p class="sec-sub">이미 검색에 강한 채널에 올라타는 것, 그게 핵심입니다.</p>
+    <div class="grid3">
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></div>
+        <h3>이미 검색에 강한 채널</h3>
+        <p>신규 블로그는 노출까지 수개월. 고방 공식 블로그는 <strong>월 17만 방문·축적된 지수</strong>로 시작부터 다릅니다.</p>
       </div>
-    </section>
-
-    <!-- 서비스 혜택 -->
-    <section class="sec">
-      <div class="sec-label">포함 내용</div>
-      <div class="benefit-list">
-        <div class="benefit-item">
-          <div class="benefit-icon">
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <rect x="3" y="1.5" width="11" height="14" rx="1.5" fill="#3182F6"/>
-              <path fill="#1B6CF2" d="M9 1.5H14V5.5H9Z"/>
-              <rect x="5" y="7"   width="7" height="1.2" rx=".6" fill="#fff"/>
-              <rect x="5" y="9.5" width="7" height="1.2" rx=".6" fill="#fff"/>
-              <rect x="5" y="12"  width="4" height="1.2" rx=".6" fill="#fff"/>
-            </svg>
-          </div>
-          <div>
-            <div class="benefit-t">고방 공식 블로그 정식 발행</div>
-            <div class="benefit-d">월 17만 명이 방문하는 고방 공식 블로그에 내 지점 포스팅이 올라가요.</div>
-          </div>
-        </div>
-        <div class="benefit-item">
-          <div class="benefit-icon">
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <circle cx="10" cy="10" r="8" fill="#3182F6"/>
-              <circle cx="10" cy="10" r="4.5" fill="#1B6CF2"/>
-              <circle cx="10" cy="10" r="1.5" fill="#EEF3FF"/>
-            </svg>
-          </div>
-          <div>
-            <div class="benefit-t">키워드 1~3개 직접 제출</div>
-            <div class="benefit-d">노리고 싶은 지역·업종 키워드를 직접 입력해요. 중복 여부는 자동 체크.</div>
-          </div>
-        </div>
-        <div class="benefit-item">
-          <div class="benefit-icon">
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <rect x="2" y="5" width="16" height="11" rx="2" fill="#3182F6"/>
-              <rect x="2" y="8" width="16" height="2.5" fill="#1B6CF2"/>
-              <rect x="4" y="11.5" width="4" height="1.5" rx=".75" fill="#EEF3FF"/>
-              <rect x="9.5" y="11.5" width="2" height="1.5" rx=".75" fill="#EEF3FF"/>
-              <rect x="12.5" y="11.5" width="2" height="1.5" rx=".75" fill="#EEF3FF"/>
-            </svg>
-          </div>
-          <div>
-            <div class="benefit-t">A/B 타입 중 직접 선택</div>
-            <div class="benefit-d">설명형(A) · 후기형(B) 중 원하는 스타일로 작성해 드려요.</div>
-          </div>
-        </div>
-        <div class="benefit-item">
-          <div class="benefit-icon">
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <rect x="2" y="2" width="10" height="13" rx="1.5" fill="#3182F6"/>
-              <rect x="4" y="5"   width="6" height="1.2" rx=".6" fill="#fff"/>
-              <rect x="4" y="7.5" width="4" height="1.2" rx=".6" fill="#fff"/>
-              <circle cx="14.5" cy="14" r="5" fill="#23B169"/>
-              <path fill="#fff" d="M11.5 14L13.3 15.8L17.5 11.5L16.5 10.5L13.3 13.8L12.5 13Z"/>
-            </svg>
-          </div>
-          <div>
-            <div class="benefit-t">결제 후 영업일 7일 내 발행</div>
-            <div class="benefit-d">발행 완료 시 카카오 알림톡으로 링크를 바로 전달해 드려요.</div>
-          </div>
-        </div>
-        <div class="benefit-item">
-          <div class="benefit-icon">
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path fill="#3182F6" d="M10 2C7.24 2 5 4.24 5 7v2h2V7a3 3 0 0 1 6 0v2h2V7c0-2.76-2.24-5-5-5Z"/>
-              <rect x="3.5" y="9" width="13" height="9" rx="2" fill="#3182F6"/>
-              <circle cx="10" cy="13.5" r="1.5" fill="#EEF3FF"/>
-              <rect x="9.3" y="13.5" width="1.4" height="2.5" rx=".7" fill="#EEF3FF"/>
-            </svg>
-          </div>
-          <div>
-            <div class="benefit-t">강조 포인트 자유 입력</div>
-            <div class="benefit-d">꼭 들어갔으면 하는 문구·특징을 자유롭게 추가할 수 있어요.</div>
-          </div>
-        </div>
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <h3>VIEW탭 상위노출 설계</h3>
+        <p>제출하신 <strong>키워드 1~3개</strong>를 검색 의도에 맞춰 배치. VIEW탭 상위 노출을 목표로 작성합니다.</p>
       </div>
-    </section>
-
-    <!-- 진행 과정 -->
-    <section class="sec">
-      <div class="sec-label">진행 과정</div>
-      <div class="process-list">
-        <div class="process-item">
-          <div class="process-num">1</div>
-          <div>
-            <div class="process-t">신청서 제출</div>
-            <div class="process-d">지점 URL, 키워드(1~3개), 강조 내용을 입력해요.</div>
-            <span class="process-badge">즉시 접수</span>
-          </div>
-        </div>
-        <div class="process-item">
-          <div class="process-num">2</div>
-          <div>
-            <div class="process-t">결제 안내 알림톡 수신</div>
-            <div class="process-d">접수 후 카카오 알림톡으로 결제 링크가 발송돼요. (10만원, VAT 별도)</div>
-            <span class="process-badge">알림톡 수신</span>
-          </div>
-        </div>
-        <div class="process-item">
-          <div class="process-num">3</div>
-          <div>
-            <div class="process-t">블로그 발행</div>
-            <div class="process-d">결제 완료 후 영업일 7일 내 고방 공식 블로그에 발행돼요. 완료 알림톡도 함께 전달돼요.</div>
-            <span class="process-badge">영업일 7일 내</span>
-          </div>
-        </div>
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
+        <h3>전문 에디터가 대필</h3>
+        <p>지점 정보만 주시면 끝. 글감 고민·작성·발행까지 <strong>전 과정을 대행</strong>합니다.</p>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
-    <!-- 작성 예시 -->
-    <section class="sec">
-      <div class="sec-label">작성 예시</div>
-      <div class="example-cards">
-        <a href="https://blog.naver.com/neoflat1116/224260067840" target="_blank" rel="noopener" class="example-card">
-          <div class="example-card-head">
-            <span class="example-tag">A타입</span>
-            <span class="example-title">설명형</span>
-          </div>
-          <div class="example-card-body">
-            지점의 특징과 환경을 객관적으로 정리해요. 가격·시설·위치 등 비교 포인트를 구조화해서 처음 보는 사람도 한 번에 파악할 수 있게 만들어요.
-            <div class="example-link">예시 글 보기 →</div>
-          </div>
-        </a>
-        <a href="https://blog.naver.com/neoflat1116/224260216013" target="_blank" rel="noopener" class="example-card">
-          <div class="example-card-head">
-            <span class="example-tag">B타입</span>
-            <span class="example-title">후기형</span>
-          </div>
-          <div class="example-card-body">
-            실제 경험을 간접 체험하게끔 후기 형식으로 풀어요. 동선·분위기·생활 체감 포인트를 묘사해서 어떤 생활이 펼쳐질지 감이 오게 만들어요.
-            <div class="example-link">예시 글 보기 →</div>
-          </div>
-        </a>
+<!-- TYPE SELECT -->
+<section id="type" style="background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="wrap center">
+    <span class="eyebrow">Type</span>
+    <h2 class="sec-title">A·B 두 가지 글 타입 중 선택</h2>
+    <p class="sec-sub">홍보 목적에 맞는 톤을 고르세요. 신청 시 하나만 선택합니다.</p>
+    <div class="type-grid">
+      <div class="type">
+        <span class="tag">A타입 · 설명형</span>
+        <h3>정보로 설득하는 글</h3>
+        <p style="font-size:15px;color:var(--t-body)">지점의 서비스·강점·이용 방법을 체계적으로 정리. 처음 알리는 지점, 정보 전달이 중요한 경우에 적합.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>지점 핵심 강점 구조화</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>검색 키워드 자연 배치</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>신규 고객 정보 탐색에 강함</li>
+        </ul>
       </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="sec">
-      <div class="sec-label">자주 묻는 질문</div>
-      <div class="faq-list" id="faqList">
-
-        <div class="faq-item">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-mark">Q</span>
-            <span class="faq-qtext">발행 후 검색 상위에 바로 노출되나요?</span>
-            <span class="faq-plus">+</span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner"><div>
-            발행 직후 검색 상위 노출은 보장하지 않아요. 네이버 알고리즘 특성상 발행 후 통상 2~4주 내에 VIEW 탭 상위권에 오르는 경우가 많지만, 키워드 경쟁도·기존 발행 글 수에 따라 달라질 수 있어요. 노출 순위와 유지 기간은 변동될 수 있음을 참고해 주세요.
-          </div></div></div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-mark">Q</span>
-            <span class="faq-qtext">같은 지점으로 여러 번 신청할 수 있나요?</span>
-            <span class="faq-plus">+</span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner"><div>
-            이벤트 기간 내 동일 지점 URL로는 1회만 신청 가능해요. 키워드가 다르더라도 동일 지점은 중복 신청이 제한돼요.
-          </div></div></div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-mark">Q</span>
-            <span class="faq-qtext">블로그 사진은 어떻게 사용되나요?</span>
-            <span class="faq-plus">+</span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner"><div>
-            고방 플랫폼(<a href="https://u-ceo.kr/login" target="_blank">u-ceo.kr</a>)에 등록된 지점 사진만 사용돼요. 추가 사진을 원하시면 신청 전에 미리 올려 주세요.
-          </div></div></div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-mark">Q</span>
-            <span class="faq-qtext">결제 방법은 어떻게 되나요?</span>
-            <span class="faq-plus">+</span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner"><div>
-            신청 접수 후 카카오 알림톡으로 결제 링크가 발송돼요. 토스 · 카카오페이 · 카드 결제 모두 가능해요. (100,000원, VAT 별도)
-          </div></div></div>
-        </div>
-
+      <div class="type">
+        <span class="tag">B타입 · 후기형</span>
+        <h3>경험으로 공감시키는 글</h3>
+        <p style="font-size:15px;color:var(--t-body)">실제 이용 경험처럼 풀어내 신뢰를 형성. 전환·방문 유도가 목적인 경우에 적합.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>생생한 경험 서술 톤</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>방문·문의 전환 유도</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>신뢰·공감 형성에 강함</li>
+        </ul>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
-    <!-- 여백 -->
-    <div style="height:16px;"></div>
+<!-- PROCESS -->
+<section id="process" class="dark">
+  <div class="wrap center">
+    <span class="eyebrow">Process</span>
+    <h2 class="sec-title">신청부터 발행까지 <span class="hl">4단계</span></h2>
+    <p class="sec-sub">번거로운 건 저희가, 결정만 사장님이.</p>
+    <div class="steps">
+      <div class="step"><div class="n">STEP 01</div><h3>신청 · 결제</h3><p>한정가로 신청서를 제출합니다.</p></div>
+      <div class="step"><div class="n">STEP 02</div><h3>키워드 제출</h3><p>타깃 키워드 1~3개와 글 타입(A/B)을 선택합니다.</p></div>
+      <div class="step"><div class="n">STEP 03</div><h3>전문 작성</h3><p>에디터가 검색 의도에 맞춰 글을 작성합니다.</p></div>
+      <div class="step"><div class="n">STEP 04</div><h3>발행 · 안내</h3><p>고방 공식 블로그에 발행 후 링크를 전달합니다.</p></div>
+    </div>
+  </div>
+</section>
 
-  </div><!-- /wrap -->
-</div><!-- /main -->
+<!-- COMPARE -->
+<section id="compare">
+  <div class="wrap center">
+    <span class="eyebrow">가성비 증명</span>
+    <h2 class="sec-title">시장 단가와 비교하면</h2>
+    <p class="sec-sub">같은 결과물, 다른 가격. 기존 고객이라 가능한 한정가입니다.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>일반 블로그 대행</th>
+            <th class="col-hi">고방 한정가</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1건 작성 단가</td><td>200,000~400,000원</td><td class="col-hi">100,000원 (VAT 별도)</td></tr>
+          <tr><td>채널 영향력</td><td>신규/저지수 블로그 다수</td><td class="col-hi">월 17만 방문 공식 블로그</td></tr>
+          <tr><td>VIEW탭 노출</td><td class="cross">불확실</td><td class="col-hi"><span class="check">상위노출 목표 설계</span></td></tr>
+          <tr><td>키워드 지정</td><td class="cross">제한적</td><td class="col-hi"><span class="check">1~3개 직접 제출</span></td></tr>
+          <tr><td>발행 기간</td><td>2~4주</td><td class="col-hi">영업일 7일 내</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:22px;font-size:15px;color:var(--t-cap)">표기 금액은 모두 공급가 기준(VAT 별도)입니다.</p>
+  </div>
+</section>
 
-<!-- 하단 고정 CTA -->
-<div class="bottom-bar">
-  <a href="#" id="bottomCta" class="bottom-cta">신청서 작성하기 →</a>
+<!-- PRICE -->
+<section id="price" style="background:#EAF4FC">
+  <div class="wrap center">
+    <span class="eyebrow">한정 혜택</span>
+    <h2 class="sec-title">기존 고객만의 <span class="hl-gold">67% 할인가</span></h2>
+    <p class="sec-sub">동일 지점 1회 한정. 마감 후에는 정가로 복귀합니다.</p>
+
+    <div class="price-card">
+      <span class="ribbon">기존 고객 한정 · 1회</span>
+      <div class="price-name">고방 공식 블로그 작성</div>
+      <div class="price2">
+        <span class="price-old">정가 300,000원</span>
+        <span class="price-now-row">
+          <span class="price-now">100,000<small>원</small></span>
+          <span class="disc-badge">67% OFF</span>
+        </span>
+        <span class="vat">VAT 별도</span>
+      </div>
+      <ul class="pc-features">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>고방 공식 블로그(월 17만 방문) 발행</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>네이버 VIEW탭 상위노출 목표 작성</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>타깃 키워드 1~3개 직접 제출</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>A·B 글 타입 선택 · 전문 에디터 대필</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>영업일 7일 내 발행 · 링크 전달</li>
+      </ul>
+      <a href="form.html" class="btn-primary applyLink" style="width:100%">
+        한정가로 신청하기
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="background:#fff;border-top:1px solid var(--border)">
+  <div class="wrap center">
+    <span class="eyebrow">FAQ</span>
+    <h2 class="sec-title">자주 묻는 질문</h2>
+    <p class="sec-sub">궁금한 점을 미리 정리했습니다.</p>
+    <div class="faq" style="text-align:left">
+      <details open>
+        <summary>왜 이렇게 저렴한가요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+        <div class="ans">기존 고객 감사 프로모션으로 정가 300,000원을 100,000원(VAT 별도)에 제공합니다. 동일 지점 1회 한정이며, 마감 후에는 정가로 복귀합니다.</div>
+      </details>
+      <details>
+        <summary>발행까지 얼마나 걸리나요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+        <div class="ans">키워드 제출 완료 후 평균 영업일 7일 내 발행합니다. 발행이 완료되면 게시글 링크를 전달드립니다.</div>
+      </details>
+      <details>
+        <summary>키워드는 어떻게 정하나요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+        <div class="ans">노출을 원하는 타깃 키워드 1~3개를 직접 제출해 주시면, 검색 의도에 맞게 글에 자연스럽게 배치합니다.</div>
+      </details>
+      <details>
+        <summary>A타입과 B타입 차이가 뭔가요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+        <div class="ans">A타입(설명형)은 지점 정보·강점을 체계적으로 전달하는 글, B타입(후기형)은 실제 경험처럼 공감을 유도하는 글입니다. 홍보 목적에 맞게 하나를 선택하세요.</div>
+      </details>
+      <details>
+        <summary>상위노출이 보장되나요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+        <div class="ans">네이버 VIEW탭 상위노출을 목표로 작성하지만, 검색 결과는 네이버 알고리즘에 따라 변동될 수 있어 순위를 100% 보장하지는 않습니다. 다만 월 17만 방문의 공식 블로그라는 강한 채널 기반에서 출발한다는 점이 핵심 강점입니다.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final">
+  <div class="wrap">
+    <h2>지금이 가장 저렴한 순간입니다</h2>
+    <p>한정가 마감 후에는 정가 300,000원으로 복귀합니다.</p>
+    <div class="price2">
+      <span class="price-old">정가 300,000원</span>
+      <span class="price-now-row">
+        <span class="price-now">100,000<small>원</small></span>
+        <span class="disc-badge">67% OFF</span>
+      </span>
+      <span class="vat">VAT 별도 · 동일 지점 1회 한정</span>
+    </div>
+    <div>
+      <a href="form.html" class="btn-primary applyLink">
+        한정가로 신청하기
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">© 고방 · 고방 공식 블로그 작성 서비스 (기존 고객 한정 프로모션) · 표기 금액은 공급가 기준(VAT 별도)</div>
+</footer>
+
+<!-- STICKY BOTTOM CTA -->
+<div class="sticky">
+  <div class="wrap sticky-in">
+    <div class="sticky-price">
+      <span class="so">정가 300,000원</span>
+      <span class="sn">100,000원 <small>(VAT 별도) · 67% OFF</small></span>
+    </div>
+    <div class="sticky-timer" id="stickyTimer" aria-live="polite">마감까지 --:--:--:--</div>
+    <a href="form.html" class="btn-primary applyLink">신청하기</a>
+  </div>
 </div>
 
 <script>
-  var FORM_URL = './form.html';
-  var END_DATE = null;
+(function(){
+  // ?from=YYYYMMDD 기준 7일 만료 관리
+  var params = new URLSearchParams(window.location.search);
+  var fromRaw = params.get('from');
+  var start;
+  function parseFrom(s){
+    if(!s || !/^\d{8}$/.test(s)) return null;
+    var y=+s.slice(0,4), mo=+s.slice(4,6)-1, d=+s.slice(6,8);
+    var dt=new Date(y,mo,d,0,0,0,0);
+    return isNaN(dt.getTime())?null:dt;
+  }
+  start = parseFrom(fromRaw) || new Date();
+  var deadline = new Date(start.getTime() + 7*24*60*60*1000); // +7일
 
-  (function() {
-    var p = new URLSearchParams(window.location.search);
-    var from = p.get('from');
-    if (from && /^\d{8}$/.test(from)) {
-      var d = from.slice(0,4) + '-' + from.slice(4,6) + '-' + from.slice(6,8);
-      END_DATE = new Date(new Date(d + 'T00:00:00+09:00').getTime() + 7 * 86400000);
-    }
+  // 신청 링크에 ?from= 전달
+  var fromParam = fromRaw && /^\d{8}$/.test(fromRaw) ? fromRaw : (function(){
+    var t=new Date();
+    return ''+t.getFullYear()+String(t.getMonth()+1).padStart(2,'0')+String(t.getDate()).padStart(2,'0');
   })();
-
-  function formUrl() {
-    var p = new URLSearchParams(window.location.search);
-    return FORM_URL + (p.get('from') ? '?from=' + p.get('from') : '');
-  }
-
-  function isExpired() { return END_DATE && new Date() > END_DATE; }
-  function noDate()    { return !END_DATE; }
-
-  function pad(n) { return String(n).padStart(2, '0'); }
-
-  function updateCountdown() {
-    var dbarN = document.getElementById('dbarN');
-    var dbarS = document.getElementById('dbarS');
-    var cdBlock = document.getElementById('cdBlock');
-
-    if (noDate()) {
-      document.getElementById('dbar').style.display = 'none';
-      return;
-    }
-    if (isExpired()) {
-      dbarN.textContent = '이벤트 종료'; dbarN.style.color = 'var(--g400)';
-      dbarS.textContent = '';
-      if (cdBlock) cdBlock.style.display = 'none';
-      return;
-    }
-
-    var ms   = END_DATE - new Date();
-    var days = Math.floor(ms / 86400000);
-    var hrs  = Math.floor((ms % 86400000) / 3600000);
-    var mins = Math.floor((ms % 3600000)  / 60000);
-    var secs = Math.floor((ms % 60000)    / 1000);
-
-    // 상단 바
-    dbarN.textContent = days === 0 ? '오늘 마감' : 'D-' + days;
-    dbarS.textContent = days === 0
-      ? '· ' + pad(hrs) + ':' + pad(mins) + ':' + pad(secs) + ' 남음'
-      : '· ' + days + '일 ' + pad(hrs) + '시간 남음';
-
-    // 히어로 카운트다운 블록
-    if (cdBlock) {
-      cdBlock.style.display = 'flex';
-      document.getElementById('cdD').textContent = pad(days);
-      document.getElementById('cdH').textContent = pad(hrs);
-      document.getElementById('cdM').textContent = pad(mins);
-      document.getElementById('cdS').textContent = pad(secs);
-      var msg = days === 0 ? '오늘 자정 종료' : days + '일 후 종료';
-      document.getElementById('cdMsg').textContent = msg;
-    }
-  }
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-
-  function setupCta() {
-    var heroCta   = document.getElementById('heroCta');
-    var heroNote  = document.getElementById('heroNote');
-    var bottomCta = document.getElementById('bottomCta');
-    var url = formUrl();
-
-    if (isExpired()) {
-      heroCta.href = '#'; heroCta.style.cssText = 'background:var(--bdr);color:var(--g400);pointer-events:none;';
-      heroNote.textContent = '이벤트가 종료됐어요.';
-      bottomCta.href = '#'; bottomCta.classList.add('disabled');
-    } else if (noDate()) {
-      heroCta.href = '#'; heroCta.style.cssText = 'background:var(--bdr);color:var(--g400);pointer-events:none;';
-      heroNote.textContent = '준비 중입니다.';
-      bottomCta.href = '#'; bottomCta.classList.add('disabled');
-    } else {
-      heroCta.href   = url;
-      bottomCta.href = url;
-    }
-  }
-
-  window.addEventListener('DOMContentLoaded', function() {
-    if (isExpired()) {
-      document.getElementById('offScreen').style.display = 'flex';
-      document.getElementById('main').style.display = 'none';
-    } else {
-      document.getElementById('main').style.display = 'block';
-    }
-    setupCta();
-
-    // FAQ 토글
-    document.querySelectorAll('.faq-q').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var item  = this.closest('.faq-item');
-        var ans   = item.querySelector('.faq-a');
-        var plus  = this.querySelector('.faq-plus');
-        var open  = ans.classList.contains('open');
-        ans.classList.toggle('open', !open);
-        plus.classList.toggle('open', !open);
-        this.setAttribute('aria-expanded', !open);
-      });
-    });
+  document.querySelectorAll('.applyLink').forEach(function(a){
+    a.setAttribute('href','form.html?from='+fromParam);
   });
+
+  var d=document.getElementById('d'),h=document.getElementById('h'),
+      m=document.getElementById('m'),s=document.getElementById('s'),
+      timerBox=document.getElementById('timer'),
+      sticky=document.getElementById('stickyTimer');
+
+  function pad(n){return String(n).padStart(2,'0');}
+  function tick(){
+    var now=new Date();
+    var diff=deadline.getTime()-now.getTime();
+    if(diff<=0){
+      if(timerBox) timerBox.innerHTML='<div class="count-expired">한정가 신청이 마감되었습니다 — 현재는 정가로 안내됩니다</div>';
+      if(sticky) sticky.textContent='한정가 마감';
+      return;
+    }
+    var dd=Math.floor(diff/86400000);
+    var hh=Math.floor(diff%86400000/3600000);
+    var mm=Math.floor(diff%3600000/60000);
+    var ss=Math.floor(diff%60000/1000);
+    if(d){d.textContent=pad(dd);h.textContent=pad(hh);m.textContent=pad(mm);s.textContent=pad(ss);}
+    if(sticky) sticky.textContent='마감까지 '+pad(dd)+':'+pad(hh)+':'+pad(mm)+':'+pad(ss);
+    requestAnimationFrame(function(){});
+  }
+  tick();
+  setInterval(tick,1000);
+})();
 </script>
+
 </body>
 </html>
