@@ -3,17 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>고방 공식 블로그 작성 서비스 · 기존 고객 한정가</title>
+<title>고방 공식 블로그 작성 · 원장님 전용 7일 한정가</title>
+<meta name="description" content="이미 함께해 주신 원장님께만. 여름특가 15만원 블로그를 단 10만원에, 지금부터 딱 7일간.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap">
 <style>
   :root{
-    --navy:#1A3A6B; --navy-deep:#0F2548;
+    --navy:#10355F; --navy-deep:#0B1E3D;
     --primary:#2B85CC; --primary-hover:#1E6FA8;
     --accent:#2B85CC; --sky:#7FC0F0;
+    --teal:#00A0B0; --teal-deep:#0B7C83; --teal-bright:#19B6C4;
+    --teal-bg:rgba(0,160,176,.08); --teal-bd:rgba(0,160,176,.28);
     --gold:#E8B84B; --gold-text:#B0801E;
     --bg:#F8FAFC; --surface:#FFFFFF;
     --t-title:#1A202C; --t-body:#4A5568; --t-cap:#718096;
     --border:#E2E8F0; --ok:#00C73C; --err:#F04452;
     --danger:#E0162B;
+    --serif:'Playfair Display',Georgia,serif;
     --r-sm:8px; --r-md:12px; --r-lg:16px;
   }
   *{margin:0;padding:0;box-sizing:border-box}
@@ -30,8 +38,8 @@
   section{padding:80px 0}
   .center{text-align:center}
   .eyebrow{
-    display:inline-block;font-size:14px;font-weight:600;letter-spacing:.04em;
-    color:var(--primary);text-transform:uppercase;margin-bottom:14px;
+    display:inline-block;font-size:13px;font-weight:700;letter-spacing:.04em;
+    color:var(--teal-deep);text-transform:uppercase;margin-bottom:14px;
   }
   .sec-title{font-size:32px;margin-bottom:14px}
   .sec-sub{font-size:18px;color:var(--t-body);max-width:620px;margin:0 auto}
@@ -53,11 +61,7 @@
   }
   .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
   .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;color:var(--navy)}
-  .logo-mark{
-    width:30px;height:30px;border-radius:8px;
-    background:linear-gradient(135deg,var(--primary),var(--navy));
-    display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;
-  }
+  .logo img{height:24px;width:auto}
   .nav-menu{display:flex;gap:28px;font-size:15px;font-weight:500}
   .nav-menu a{color:var(--t-body);transition:color .15s}
   .nav-menu a:hover{color:var(--primary)}
@@ -72,15 +76,25 @@
 
   /* HERO */
   .hero{
-    background:linear-gradient(180deg,#FFFFFF 0%,#EAF4FC 100%);
-    padding:72px 0 88px;text-align:center;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,#FFFFFF 0%,#EAF6F8 100%);
+    padding:64px 0 88px;text-align:center;position:relative;overflow:hidden;
   }
+  .hero::before{
+    content:"";position:absolute;top:-120px;left:50%;transform:translateX(-50%);
+    width:680px;height:480px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(closest-side,rgba(0,160,176,.20),rgba(0,160,176,0) 72%);
+    filter:blur(8px);z-index:0;
+  }
+  .hero .wrap{position:relative;z-index:1}
+  .hero-logo{margin:0 auto 22px;display:flex;justify-content:center}
+  .hero-logo img{height:40px;width:auto}
   .badge-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
   .chip{
     display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;
     padding:7px 14px;border-radius:999px;background:#fff;border:1px solid var(--border);color:var(--navy);
   }
   .chip.gold{background:#FFF8E8;border-color:#F0DCA6;color:var(--gold-text)}
+  .chip.teal{background:var(--teal-bg);border-color:var(--teal-bd);color:var(--teal-deep)}
   .chip svg{width:15px;height:15px}
   .hero h1{
     font-size:48px;font-weight:800;letter-spacing:-.02em;line-height:1.25;
@@ -114,8 +128,8 @@
   .price2{display:inline-flex;flex-direction:column;align-items:center;gap:2px}
   .price-old{font-size:19px;color:var(--t-cap);text-decoration:line-through;font-weight:500}
   .price-now-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;justify-content:center}
-  .price-now{font-size:42px;font-weight:800;color:var(--navy-deep);letter-spacing:-.02em}
-  .price-now small{font-size:18px;font-weight:700}
+  .price-now{font-family:var(--serif);font-size:48px;font-weight:800;color:var(--navy-deep);letter-spacing:-.01em;line-height:1}
+  .price-now small{font-family:Pretendard,sans-serif;font-size:18px;font-weight:700;margin-left:2px}
   .disc-badge{
     background:var(--danger);color:#fff;font-size:15px;font-weight:800;
     padding:5px 12px;border-radius:999px;align-self:center;
@@ -202,7 +216,7 @@
   }
   .price-card .ribbon{
     position:absolute;top:-14px;left:50%;transform:translateX(-50%);
-    background:var(--gold);color:#fff;font-size:13px;font-weight:800;
+    background:linear-gradient(135deg,var(--teal),var(--teal-deep));color:#fff;font-size:13px;font-weight:800;
     padding:7px 18px;border-radius:999px;white-space:nowrap;
   }
   .price-name{font-size:20px;font-weight:700;color:var(--navy);margin:10px 0 22px}
@@ -284,38 +298,39 @@
 <!-- NAV -->
 <nav class="nav">
   <div class="wrap nav-in">
-    <a href="#top" class="logo"><span class="logo-mark" aria-hidden="true">G</span>고방 블로그</a>
+    <a href="#top" class="logo"><img src="assets/U_ALF.png" alt="고방">고방 블로그</a>
     <div class="nav-menu">
       <a href="#why">왜 고방인가</a>
       <a href="#type">타입 선택</a>
       <a href="#process">진행과정</a>
-      <a href="#compare">가성비</a>
+      <a href="https://landing-two-tau-94.vercel.app/" target="_blank" rel="noopener">상품 자세히</a>
       <a href="#faq">FAQ</a>
     </div>
-    <a href="#price" class="nav-cta">지금 신청</a>
+    <a href="#price" class="nav-cta">10만원 신청</a>
   </div>
 </nav>
 
 <!-- HERO -->
 <header class="hero" id="top">
   <div class="wrap">
+    <div class="hero-logo"><img src="assets/U_ALF.png" alt="고방 블로그 마케팅"></div>
     <div class="badge-row">
-      <span class="chip gold">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 17.3 5.7 21.4 8 14 2 9.4h7.6z"/></svg>
-        기존 고객 한정 프로모션
+      <span class="chip teal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        이미 구매하신 원장님 전용
       </span>
       <span class="chip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-        동일 지점 1회 한정
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        지금부터 딱 7일간
       </span>
     </div>
 
     <h1>
-      월 17만 명이 보는 고방 공식 블로그에<br>
-      <span class="hl">우리 지점 홍보글</span>이 올라갑니다<br>
-      네이버 VIEW탭 상위노출까지
+      여름특가 15만원짜리 블로그,<br>
+      원장님껜 <span class="hl">단 10만원</span>에<br>
+      지금부터 딱 7일간
     </h1>
-    <p class="lead">전문 에디터가 영업일 7일 내 발행. 키워드는 직접 정하고, 글 타입만 고르세요.</p>
+    <p class="lead">월 17만 명이 보는 고방 공식 블로그 발행. 이미 함께해 주신 원장님께만 드리는 7일 한정가입니다.</p>
 
     <!-- COUNTDOWN -->
     <div class="count-box" role="timer" aria-live="polite">
@@ -336,20 +351,23 @@
 
     <!-- HERO PRICE (2-line) -->
     <div class="price2" style="margin-bottom:30px">
-      <span class="price-old">정가 300,000원</span>
+      <span class="price-old">여름특가 150,000원</span>
       <span class="price-now-row">
         <span class="price-now">100,000<small>원</small></span>
-        <span class="disc-badge">67% OFF</span>
+        <span class="disc-badge">원장님가 −5만</span>
       </span>
-      <span class="vat">VAT 별도 · 기존 고객 한정가</span>
+      <span class="vat">VAT 별도 · 7일간만 적용</span>
     </div>
 
     <div>
       <a href="#price" class="btn-primary" id="heroCta">
-        지금 한정가로 신청하기
+        지금 10만원에 신청하기
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-      <p class="hero-cta-note">신청 후 키워드만 보내주시면 끝. 평균 영업일 7일 내 발행</p>
+      <p class="hero-cta-note">
+        신청 후 키워드만 보내주시면 끝 · 영업일 7일 내 발행 ·
+        <a href="https://landing-two-tau-94.vercel.app/" target="_blank" rel="noopener" style="color:var(--teal-deep);font-weight:700;text-decoration:underline">블로그 상품 자세히 보기 →</a>
+      </p>
     </div>
 
     <!-- METRICS -->
@@ -439,14 +457,14 @@
   <div class="wrap center">
     <span class="eyebrow">가성비 증명</span>
     <h2 class="sec-title">시장 단가와 비교하면</h2>
-    <p class="sec-sub">같은 결과물, 다른 가격. 기존 고객이라 가능한 한정가입니다.</p>
+    <p class="sec-sub">같은 결과물, 다른 가격. 이미 함께해 주신 원장님이라 가능한 전용가입니다.</p>
     <div class="tbl-wrap">
       <table>
         <thead>
           <tr>
             <th>항목</th>
             <th>일반 블로그 대행</th>
-            <th class="col-hi">고방 한정가</th>
+            <th class="col-hi">원장님 전용가</th>
           </tr>
         </thead>
         <tbody>
@@ -463,20 +481,20 @@
 </section>
 
 <!-- PRICE -->
-<section id="price" style="background:#EAF4FC">
+<section id="price" style="background:#EAF6F8">
   <div class="wrap center">
-    <span class="eyebrow">한정 혜택</span>
-    <h2 class="sec-title">기존 고객만의 <span class="hl-gold">67% 할인가</span></h2>
-    <p class="sec-sub">동일 지점 1회 한정. 마감 후에는 정가로 복귀합니다.</p>
+    <span class="eyebrow">원장님 전용 혜택</span>
+    <h2 class="sec-title">원장님께만 드리는 <span class="hl">10만원</span></h2>
+    <p class="sec-sub">여름특가 15만원에서 5만원 더. 신청일로부터 딱 7일간만 적용됩니다.</p>
 
     <div class="price-card">
-      <span class="ribbon">기존 고객 한정 · 1회</span>
+      <span class="ribbon">원장님 전용 · 7일 한정</span>
       <div class="price-name">고방 공식 블로그 작성</div>
       <div class="price2">
-        <span class="price-old">정가 300,000원</span>
+        <span class="price-old">여름특가 150,000원</span>
         <span class="price-now-row">
           <span class="price-now">100,000<small>원</small></span>
-          <span class="disc-badge">67% OFF</span>
+          <span class="disc-badge">원장님가 −5만</span>
         </span>
         <span class="vat">VAT 별도</span>
       </div>
@@ -488,9 +506,13 @@
         <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>영업일 7일 내 발행 · 링크 전달</li>
       </ul>
       <a href="form.html" class="btn-primary applyLink" style="width:100%">
-        한정가로 신청하기
+        10만원에 신청하기
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
+      <p style="margin-top:16px;font-size:14px;color:var(--t-cap)">
+        블로그 상품이 더 궁금하세요?
+        <a href="https://landing-two-tau-94.vercel.app/" target="_blank" rel="noopener" style="color:var(--teal-deep);font-weight:700;text-decoration:underline">상품 안내 페이지에서 자세히 보기 →</a>
+      </p>
     </div>
   </div>
 </section>
@@ -504,7 +526,7 @@
     <div class="faq" style="text-align:left">
       <details open>
         <summary>왜 이렇게 저렴한가요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
-        <div class="ans">기존 고객 감사 프로모션으로 정가 300,000원을 100,000원(VAT 별도)에 제공합니다. 동일 지점 1회 한정이며, 마감 후에는 정가로 복귀합니다.</div>
+        <div class="ans">이미 고방과 함께해 주신 원장님께 드리는 감사 혜택입니다. 여름특가 150,000원에서 5만원 더 낮춘 원장님 전용가 100,000원(VAT 별도)이며, 신청일로부터 딱 7일간만 적용됩니다. 이후에는 여름특가로 복귀합니다.</div>
       </details>
       <details>
         <summary>발행까지 얼마나 걸리나요?<span class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></summary>
@@ -529,19 +551,19 @@
 <!-- FINAL CTA -->
 <section class="final">
   <div class="wrap">
-    <h2>지금이 가장 저렴한 순간입니다</h2>
-    <p>한정가 마감 후에는 정가 300,000원으로 복귀합니다.</p>
+    <h2>원장님껜 지금이 가장 저렴합니다</h2>
+    <p>7일이 지나면 여름특가 150,000원으로 돌아갑니다.</p>
     <div class="price2">
-      <span class="price-old">정가 300,000원</span>
+      <span class="price-old">여름특가 150,000원</span>
       <span class="price-now-row">
         <span class="price-now">100,000<small>원</small></span>
-        <span class="disc-badge">67% OFF</span>
+        <span class="disc-badge">원장님가 −5만</span>
       </span>
-      <span class="vat">VAT 별도 · 동일 지점 1회 한정</span>
+      <span class="vat">VAT 별도 · 7일간만 적용</span>
     </div>
     <div>
       <a href="form.html" class="btn-primary applyLink">
-        한정가로 신청하기
+        10만원에 신청하기
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
@@ -549,15 +571,15 @@
 </section>
 
 <footer>
-  <div class="wrap">© 고방 · 고방 공식 블로그 작성 서비스 (기존 고객 한정 프로모션) · 표기 금액은 공급가 기준(VAT 별도)</div>
+  <div class="wrap">© 고방 · 고방 공식 블로그 작성 서비스 (원장님 전용 7일 한정가) · 표기 금액은 공급가 기준(VAT 별도)</div>
 </footer>
 
 <!-- STICKY BOTTOM CTA -->
 <div class="sticky">
   <div class="wrap sticky-in">
     <div class="sticky-price">
-      <span class="so">정가 300,000원</span>
-      <span class="sn">100,000원 <small>(VAT 별도) · 67% OFF</small></span>
+      <span class="so">여름특가 150,000원</span>
+      <span class="sn">100,000원 <small>(VAT 별도) · 원장님 전용</small></span>
     </div>
     <div class="sticky-timer" id="stickyTimer" aria-live="polite">마감까지 --:--:--:--</div>
     <a href="form.html" class="btn-primary applyLink">신청하기</a>

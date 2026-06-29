@@ -23,6 +23,15 @@
     /* ── 레이아웃 ── */
     .page { max-width: 480px; margin: 0 auto; }
 
+    /* ── 헤더 (로고 + 타이틀) ── */
+    .header { background: var(--sur); border-bottom: 1px solid var(--bdr); padding: 20px 20px 0; }
+    .header-inner { max-width: 480px; margin: 0 auto; padding-bottom: 20px; }
+    .header-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .header-logo img { height: 26px; width: auto; }
+    .header-logo-text { font-size: 14px; font-weight: 700; color: var(--g900); }
+    .header h1 { font-size: 20px; font-weight: 700; color: var(--g900); line-height: 1.4; }
+    .header p { font-size: 14px; color: var(--g500); margin-top: 4px; }
+
     /* ── D-DAY 바 ── */
     #dbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
@@ -212,6 +221,18 @@
 <!-- 메인 폼 -->
 <div id="formArea" style="display:none;">
   <div class="page">
+
+    <!-- 헤더 -->
+    <div class="header">
+      <div class="header-inner">
+        <div class="header-logo">
+          <img src="assets/U_ALF.png" alt="고방">
+          <span class="header-logo-text">고방 블로그 마케팅</span>
+        </div>
+        <h1>블로그 작성 신청서</h1>
+        <p>원장님 전용가 10만원 · 키워드와 지점 정보를 입력해 주세요</p>
+      </div>
+    </div>
 
     <!-- 상태 배너 -->
     <div id="statusBanner" style="display:none; padding:8px 0 0;">
