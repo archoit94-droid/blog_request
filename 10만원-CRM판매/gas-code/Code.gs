@@ -1,7 +1,7 @@
 var SPREADSHEET_ID    = '1lgAsrtoeqv1-g3Nh3D21zTyuGLdAZuP5jSXxftlIxh0';
 var TEMPLATE_PAYMENT  = 'KA01TP260515054842407YswDmAiR0ae';
 var TEMPLATE_COMPLETE = 'KA01TP2605150533203936iNKdKqNSyV';
-var FORM_BASE_URL     = 'https://gobangmkt.github.io/blog_request/';
+var FORM_BASE_URL     = 'https://gobangmkt.github.io/blog_request/10만원-CRM판매/';
 var LINK_TTL_DAYS     = 5; // 발급일 + 5일이 개인별 마감
 
 // ── 서명 링크 (URL 위조 방지) ───────────────────────────────────────
@@ -120,7 +120,7 @@ function genLink(token, from) {
   if (!/^\d{8}$/.test(from)) return { ok: false, reason: 'invalid_date' };
   return {
     ok: true,
-    link: FORM_BASE_URL + '?from=' + from + '&sig=' + makeSig(from),
+    link: encodeURI(FORM_BASE_URL) + '?from=' + from + '&sig=' + makeSig(from),
     end:  Utilities.formatDate(linkEndDate(from), 'Asia/Seoul', 'yyyy.MM.dd')
   };
 }

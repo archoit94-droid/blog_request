@@ -7,6 +7,19 @@
 
 ---
 
+## ⚠️ 폼 분화 (2026-06-30)
+
+루트 `index.html`은 `15만원-여름특가/`로 리다이렉트. 상품별 독립 폴더 + **독립 GAS 프로젝트**:
+- `10만원-CRM판매/` — 원장 전용 10만원(정가15만·5만원할인). **서명 링크 발급제**. scriptId `1NHD3a…`, exec `AKfycbz20Sjj…`(@6)
+- `15만원-여름특가/` — 여름특가 15만원. 아래 GAS API의 GAS_URL(`AKfycbygEz…`)은 이 계열 기준
+
+### 10만원 폼 — 서명 링크 절대 규칙
+- 마감 = `from`(YYYYMMDD)+5일. 서버 비밀키 HMAC `sig`로 서명. `verifyLink`가 `checkAccess`·`submitForm`에서 서명·기간 재검증 → **클라(form.html) 검증만 믿지 말 것. 마감 우회 방지의 핵심은 서버 게이트.**
+- 발급 = `genLink`(운영자 토큰 `INBOX_TOKEN` 필요) + `?gen` 발급 페이지. `LINK_SECRET`은 스크립트 속성 자동 생성 — **코드 하드코딩 금지(공개 repo).**
+- `FORM_BASE_URL`은 반드시 `…/blog_request/10만원-CRM판매/` (루트로 두면 15만원으로 튕김). 한글 경로 `encodeURI`.
+
+---
+
 ## 배포
 
 | 대상 | URL | 방법 |
@@ -114,7 +127,8 @@ var GAS_URL = 'https://script.google.com/macros/s/AKfycbygEzqWKlYa1EgStmNY1wxvIL
 ### API actions
 | action | 설명 |
 |--------|------|
-| `checkAccess` | 이벤트 기간/마감 여부 확인 + 상태 배너 데이터 반환 |
+| `checkAccess` | 서명(from·sig) + 이벤트 기간/마감 검증 + 상태 배너 데이터 반환 |
+| `genLink` | (운영자 토큰) 시작일로 서명 신청 링크 발급 — 발급 페이지(`?gen`)가 호출 |
 | `checkPlaceUrl` | 지점 URL 중복 신청 여부 확인 |
 | `fetchPlaceInfo` | 지점 URL로 OG 정보(이미지·제목·설명) 가져오기 |
 | `checkKeyword` | 키워드 사용 가능 여부 + 남은 일수 확인 |
