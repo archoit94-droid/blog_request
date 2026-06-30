@@ -1,6 +1,41 @@
 var SPREADSHEET_ID    = '1lgAsrtoeqv1-g3Nh3D21zTyuGLdAZuP5jSXxftlIxh0';
 var TEMPLATE_PAYMENT  = 'KA01TP260515054842407YswDmAiR0ae';
 var TEMPLATE_COMPLETE = 'KA01TP2605150533203936iNKdKqNSyV';
+var FORM_BASE_URL     = 'https://gobangmkt.github.io/blog_request/';
+var LINK_TTL_DAYS     = 5; // 발급일 + 5일이 개인별 마감
+
+// ── 서명 링크 (URL 위조 방지) ───────────────────────────────────────
+// 비밀키는 스크립트 속성에 1회 자동 생성·보관 → 코드/깃에 노출되지 않음.
+function getLinkSecret() {
+  var props = PropertiesService.getScriptProperties();
+  var s = props.getProperty('LINK_SECRET');
+  if (!s) {
+    s = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+    props.setProperty('LINK_SECRET', s);
+  }
+  return s;
+}
+
+// from(YYYYMMDD) → 서명 16자 (base64url)
+function makeSig(from) {
+  var raw = Utilities.computeHmacSha256Signature(String(from), getLinkSecret());
+  return Utilities.base64EncodeWebSafe(raw).replace(/[=]+$/, '').slice(0, 16);
+}
+
+// 발급일 자정 + LINK_TTL_DAYS = 개인 마감 (form.html과 동일 기준, Asia/Seoul)
+function linkEndDate(from) {
+  var y = parseInt(from.slice(0, 4), 10), mo = parseInt(from.slice(4, 6), 10), d = parseInt(from.slice(6, 8), 10);
+  return new Date(new Date(y, mo - 1, d, 0, 0, 0, 0).getTime() + LINK_TTL_DAYS * 86400000);
+}
+
+// 서명·기간 검증 — 서버 최종 방어선. from/sig는 클라가 조작해도 여기서 막힘.
+function verifyLink(from, sig) {
+  from = String(from || '');
+  if (!/^\d{8}$/.test(from))            return { ok: false, reason: '유효하지 않은 링크예요' };
+  if (sig !== makeSig(from))            return { ok: false, reason: '유효하지 않은 링크예요' };
+  if (new Date() > linkEndDate(from))   return { ok: false, reason: '신청 기간이 마감되었어요' };
+  return { ok: true };
+}
 
 function getSettings() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -71,8 +106,68 @@ function checkAccess() {
 }
 
 function doGet(e) {
+  if (e && e.parameter && e.parameter.gen !== undefined) {
+    return renderLinkGenerator();
+  }
   return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+// 서명 링크 발급 (운영자 토큰 필요) — 무인증 발급을 막아 서명 방어를 유지한다.
+function genLink(token, from) {
+  if (!checkInboxToken_(token)) return { ok: false, reason: 'unauthorized' };
+  from = String(from || '');
+  if (!/^\d{8}$/.test(from)) return { ok: false, reason: 'invalid_date' };
+  return {
+    ok: true,
+    link: FORM_BASE_URL + '?from=' + from + '&sig=' + makeSig(from),
+    end:  Utilities.formatDate(linkEndDate(from), 'Asia/Seoul', 'yyyy.MM.dd')
+  };
+}
+
+// 운영자용 발급 페이지 — 웹앱 URL 뒤에 ?gen 을 붙여 접속. 토큰+날짜 입력 시 genLink 호출.
+function renderLinkGenerator() {
+  var SELF = ScriptApp.getService().getUrl();
+  var h =
+  '<!doctype html><html lang="ko"><head><meta charset="utf-8">' +
+  '<meta name="viewport" content="width=device-width,initial-scale=1"><title>신청 링크 발급</title><style>' +
+  '*{box-sizing:border-box;margin:0;padding:0}' +
+  'body{font-family:-apple-system,"Segoe UI",sans-serif;background:#F2F4F6;color:#191F28;padding:34px 18px;line-height:1.5}' +
+  '.wrap{max-width:520px;margin:0 auto}h1{font-size:20px;font-weight:800;margin-bottom:6px}' +
+  '.desc{font-size:14px;color:#8B95A1;margin-bottom:22px;word-break:keep-all}' +
+  'label{display:block;font-size:13px;font-weight:700;color:#4A5568;margin:0 0 7px}' +
+  'input{width:100%;padding:13px 14px;border:1.5px solid #E5E8EB;border-radius:10px;font-size:15px;font-family:inherit;margin-bottom:14px}' +
+  'button{width:100%;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;padding:14px;background:#3182F6;color:#fff}' +
+  '.card{background:#fff;border:1px solid #E5E8EB;border-radius:14px;padding:20px;margin-top:20px}' +
+  '.lbl{font-size:12px;font-weight:700;color:#8B95A1;letter-spacing:.4px;margin-bottom:10px}' +
+  '.link{font-size:13px;word-break:break-all;background:#F8FAFF;border:1px solid #D0E2FF;border-radius:9px;padding:12px 14px;color:#1B6CF2;margin-bottom:12px}' +
+  '.copy{background:#00A0B0;margin-top:2px}.meta{font-size:13px;color:#8B95A1;margin-top:12px;text-align:center}' +
+  '.err{color:#D92B2B;font-size:14px;font-weight:600;margin-top:16px}' +
+  '.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#191F28;color:#fff;font-size:14px;padding:11px 20px;border-radius:999px;opacity:0;transition:opacity .2s}.toast.on{opacity:1}' +
+  '</style></head><body><div class="wrap">' +
+  '<h1>신청 링크 발급</h1>' +
+  '<div class="desc">운영자 토큰과 날짜를 입력하면 위조 방지 서명이 붙은 신청 링크가 생성돼요. 받는 분이 주소의 날짜를 바꿔도 서명이 맞지 않아 신청되지 않습니다.</div>' +
+  '<label>운영자 토큰</label><input type="password" id="tk" placeholder="발급 토큰" autocomplete="off">' +
+  '<label>시작 날짜 (이 날부터 5일간 유효)</label><input type="date" id="dt">' +
+  '<button onclick="g()" id="gb">링크 생성</button>' +
+  '<div id="out"></div>' +
+  '<div class="toast" id="toast">복사됐어요</div></div><script>' +
+  'var SELF=' + JSON.stringify(SELF) + ';' +
+  '(function(){var d=new Date();document.getElementById("dt").value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");' +
+  'var s=sessionStorage.getItem("gentk");if(s)document.getElementById("tk").value=s;})();' +
+  'function g(){var tk=document.getElementById("tk").value.trim();var v=document.getElementById("dt").value;' +
+  'if(!tk){alert("토큰을 입력하세요");return;}if(!v){alert("날짜를 선택하세요");return;}' +
+  'sessionStorage.setItem("gentk",tk);var b=document.getElementById("gb");b.disabled=true;b.textContent="생성 중...";' +
+  'fetch(SELF,{method:"POST",body:JSON.stringify({action:"genLink",token:tk,from:v.replace(/-/g,"")})}).then(function(r){return r.json();}).then(function(d){' +
+  'b.disabled=false;b.textContent="링크 생성";var o=document.getElementById("out");' +
+  'if(!d.ok){o.innerHTML="<div class=\\"err\\">"+(d.reason==="unauthorized"?"토큰이 올바르지 않습니다.":"날짜가 올바르지 않습니다.")+"</div>";return;}' +
+  'o.innerHTML="<div class=\\"card\\"><div class=\\"lbl\\">발급된 신청 링크</div><div class=\\"link\\" id=\\"lnk\\">"+d.link+"</div>"+' +
+  '"<button class=\\"copy\\" onclick=\\"cp()\\">링크 복사</button><div class=\\"meta\\">마감 "+d.end+" · 발급일 +5일</div></div>";' +
+  '}).catch(function(){b.disabled=false;b.textContent="링크 생성";alert("오류가 발생했어요");});}' +
+  'function cp(){var t=document.getElementById("lnk").innerText;navigator.clipboard.writeText(t).then(function(){var e=document.getElementById("toast");e.classList.add("on");setTimeout(function(){e.classList.remove("on");},1400);});}' +
+  '</script></body></html>';
+  return HtmlService.createHtmlOutput(h).setTitle('신청 링크 발급')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
 function doPost(e) {
@@ -82,7 +177,8 @@ function doPost(e) {
     var result;
 
     if (action === 'checkAccess') {
-      var access = checkAccess();
+      var link = verifyLink(payload.from, payload.sig);
+      var access = link.ok ? checkAccess() : link;
       var cfg = getSettings();
       var currentCount = countApplicationsInPeriod(cfg);
       result = {
@@ -101,6 +197,8 @@ function doPost(e) {
       result = checkPlaceUrl(payload.url);
     } else if (action === 'submitForm') {
       result = submitForm(payload);
+    } else if (action === 'genLink') {
+      result = genLink(payload.token, payload.from);
     } else if (action === 'listRequests') {
       result = listRequests(payload.token);
     } else if (action === 'sendPaymentLink') {
@@ -210,6 +308,12 @@ function fetchPlaceInfo(url) {
 }
 
 function submitForm(formData) {
+  // 서버 최종 방어선 — URL 조작으로 마감을 우회해도 여기서 거부된다.
+  var link = verifyLink(formData.from, formData.sig);
+  if (!link.ok) return { success: false, reason: link.reason };
+  var access = checkAccess();
+  if (!access.ok) return { success: false, reason: access.reason };
+
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
   var urlCheck = checkPlaceUrl(formData.placeUrl);

@@ -60,7 +60,8 @@
     .hero5-cd .cd-l { font-size: 11px; font-weight: 600; color: var(--g500); }
     .hero5-cd .cd-sep { font-size: 26px; font-weight: 800; color: var(--g300); line-height: 1.5; }
     .hero5-cd-msg { font-size: 12px; font-weight: 600; color: var(--err-str); margin-top: 12px; }
-    .hero5-price { display: inline-flex; align-items: baseline; gap: 10px; margin-top: 22px; }
+    .p-save { display: inline-block; margin-top: 22px; font-size: 13px; font-weight: 800; color: #fff; background: var(--err); padding: 6px 15px; border-radius: 999px; letter-spacing: -.2px; }
+    .hero5-price { display: inline-flex; align-items: baseline; gap: 10px; margin-top: 10px; }
     .hero5-price .p-old { font-size: 19px; color: var(--g500); text-decoration: line-through; font-weight: 600; }
     .hero5-price .p-arrow { font-size: 20px; color: var(--g400); }
     .hero5-price .p-now { font-size: 42px; font-weight: 800; color: var(--teal); letter-spacing: -1px; }
@@ -70,6 +71,18 @@
     /* ── 상태 배너 ── */
     .status-banner { max-width: 480px; margin: 8px auto 0; padding: 0 0; }
     .status-urgent { font-size: 13px; font-weight: 600; color: var(--err-str); background: var(--err-bg); border-radius: 8px; padding: 10px 16px; margin: 0 0; }
+
+    /* ── 강점 섹션 ── */
+    .adv-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
+    .adv-stat { text-align: center; background: var(--teal-bg); border: 1px solid var(--teal-bd); border-radius: 12px; padding: 14px 6px; }
+    .adv-n { font-size: 18px; font-weight: 800; color: var(--teal); letter-spacing: -.3px; }
+    .adv-l { font-size: 11px; color: var(--g600); margin-top: 6px; line-height: 1.35; font-weight: 600; }
+    .adv-list { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+    .adv-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; color: var(--g700); line-height: 1.55; word-break: keep-all; }
+    .adv-list li b { color: var(--g900); font-weight: 700; }
+    .adv-ic { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+    .adv-more { display: block; text-align: center; margin-top: 18px; padding: 13px; background: var(--info); border: 1.5px solid var(--bdr-i); border-radius: 10px; font-size: 14px; font-weight: 700; color: var(--pri); text-decoration: none; }
+    .adv-more:hover { background: var(--pri-100); }
 
     /* ── 섹션 ── */
     .sec { background: var(--sur); margin-top: 8px; padding: 20px 20px 16px; }
@@ -249,8 +262,8 @@
           <img src="assets/U_ALF.png" alt="고방">
           <span>고방 블로그 마케팅</span>
         </div>
-        <h1 class="hero5-title">원장님 전용 · 5일 한정</h1>
-        <p class="hero5-sub">이미 함께해 주신 원장님께만 <b>5만원 할인</b></p>
+        <h1 class="hero5-title">기존 원장님께만<br><b>5만원 할인</b></h1>
+        <p class="hero5-sub">함께해 주신 분들께 단 <b>5일</b>간 열리는 전용가</p>
         <div class="hero5-cd" id="hero5cd">
           <div class="cd-u"><span class="cd-n" id="h5D">00</span><span class="cd-l">일</span></div>
           <span class="cd-sep">:</span>
@@ -261,6 +274,7 @@
           <div class="cd-u"><span class="cd-n" id="h5S">00</span><span class="cd-l">초</span></div>
         </div>
         <div class="hero5-cd-msg" id="h5Msg">마감까지 남은 시간</div>
+        <div class="p-save">정가에서 5만원 즉시 할인</div>
         <div class="hero5-price">
           <span class="p-old">정가 15만원</span>
           <span class="p-arrow">→</span>
@@ -272,6 +286,22 @@
     <!-- 상태 배너 -->
     <div id="statusBanner" style="display:none; padding:8px 0 0;">
       <div id="statusInner" class="status-urgent" style="margin:0 0;border-radius:0;"></div>
+    </div>
+
+    <!-- 강점 -->
+    <div class="sec adv">
+      <div class="adv-stats">
+        <div class="adv-stat"><div class="adv-n">월 17만+</div><div class="adv-l">공식 블로그<br>방문자</div></div>
+        <div class="adv-stat"><div class="adv-n">최적화 2+</div><div class="adv-l">네이버<br>블로그 지수</div></div>
+        <div class="adv-stat"><div class="adv-n">상위 2.8%</div><div class="adv-l">1인주거<br>특화 채널</div></div>
+      </div>
+      <ul class="adv-list">
+        <li><svg class="adv-ic" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="10" fill="#00A0B0"/><path d="M5.6 10.4l2.6 2.6 6.2-6.2" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>월 17만 명이 보는 <b>고방 공식 블로그</b>에 내 지점 글을 정식 발행</span></li>
+        <li><svg class="adv-ic" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="10" fill="#00A0B0"/><path d="M5.6 10.4l2.6 2.6 6.2-6.2" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>노리는 <b>키워드 1~3개를 직접 지정</b> · 블로그탭 상단 노출을 목표로 작성</span></li>
+        <li><svg class="adv-ic" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="10" fill="#00A0B0"/><path d="M5.6 10.4l2.6 2.6 6.2-6.2" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>설명형·후기형 <b>템플릿 선택</b> + 강조 포인트 반영</span></li>
+        <li><svg class="adv-ic" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="10" fill="#00A0B0"/><path d="M5.6 10.4l2.6 2.6 6.2-6.2" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>완료 시 <b>발행 URL 알림톡</b> 발송 · 결제 후 영업일 7일 내</span></li>
+      </ul>
+      <a class="adv-more" href="https://landing-two-tau-94.vercel.app/" target="_blank" rel="noopener">블로그 상품·실적 자세히 보기 →</a>
     </div>
 
     <form id="applyForm" novalidate>
@@ -487,13 +517,16 @@
 <script>
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbz20SjjyYfinAwwuNYAzPTHGGkFBWK4vJQ1BL0ZxJrwYjvcDdswE9wTWk73PgcnEFN-HA/exec';
   var END_DATE = null;
+  var LINK_FROM = '', LINK_SIG = '';  // 서명 링크 — 서버 검증용으로 그대로 전달
 
   (function() {
     var p = new URLSearchParams(window.location.search);
     var from = p.get('from');
+    LINK_SIG = p.get('sig') || '';
     if (from && /^\d{8}$/.test(from)) {
+      LINK_FROM = from;
       var d = from.slice(0,4) + '-' + from.slice(4,6) + '-' + from.slice(6,8);
-      // 5,5 이벤트 — 시작일 +5일이 마감
+      // 5,5 이벤트 — 시작일 +5일이 마감 (최종 판정은 서버 verifyLink)
       END_DATE = new Date(new Date(d + 'T00:00:00+09:00').getTime() + 5 * 86400000);
     }
   })();
@@ -554,7 +587,7 @@
     }
     document.getElementById('formArea').style.display = 'block';
     if (window.__syncDbar) window.__syncDbar();
-    callAPI('checkAccess').then(function(d) {
+    callAPI('checkAccess', { from: LINK_FROM, sig: LINK_SIG }).then(function(d) {
       if (!d.ok) { document.getElementById('formArea').style.display = 'none'; document.getElementById('offMsg').textContent = d.reason; document.getElementById('offScreen').style.display = 'flex'; return; }
       if (d.maxCount > 0) {
         var rem = d.maxCount - d.currentCount;
@@ -730,10 +763,18 @@
       monthly:      document.getElementById('monthly').value.trim(),
       walking:      document.getElementById('walking').value.trim(),
       templateType: selTmpl,
+      from:         LINK_FROM,
+      sig:          LINK_SIG,
       source:       'v3'
     }).then(function(r) {
       if (r.success) { document.getElementById('formArea').style.display = 'none'; document.getElementById('successScreen').style.display = 'flex'; window.scrollTo(0,0); }
-      else { btn.disabled = false; btn.textContent = '신청 접수하기'; alert(r.reason === 'duplicate_url' ? '이미 신청된 지점 URL이에요.' : '오류가 발생했어요. 다시 시도해 주세요.'); }
+      else {
+        btn.disabled = false; btn.textContent = '신청 접수하기';
+        var msg = r.reason === 'duplicate_url' ? '이미 신청된 지점 URL이에요.'
+                : (r.reason && /링크|마감|기간|인원|받지/.test(r.reason)) ? r.reason
+                : '오류가 발생했어요. 다시 시도해 주세요.';
+        alert(msg);
+      }
     }).catch(function(){ btn.disabled = false; btn.textContent = '신청 접수하기'; alert('오류가 발생했어요. 다시 시도해 주세요.'); });
   });
 </script>
