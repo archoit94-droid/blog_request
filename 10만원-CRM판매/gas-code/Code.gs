@@ -208,6 +208,7 @@ function renderLinkGenerator() {
   '(function(){var d=new Date();document.getElementById("dt").value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");' +
   'var s=sessionStorage.getItem("gentk");if(s)document.getElementById("tk").value=s;renderHist();})();' +
   'function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}' +
+  'function fmtFrom(f){f=String(f||"");return /^\\d{8}$/.test(f)?(f.slice(0,4)+"."+f.slice(4,6)+"."+f.slice(6,8)):f;}' +
   'function showToastMsg(m){var e=document.getElementById("toast");e.textContent=m;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},1400);}' +
   'function showToast(){showToastMsg("복사됐어요");}' +
   'function renderHist(){var h=document.getElementById("hist");if(!LOG.length){h.innerHTML="";return;}' +
@@ -215,7 +216,7 @@ function renderLinkGenerator() {
   'var html="<div class=\\"hist-h\\">발급 이력 ("+LOG.length+")</div>";' +
   'order.forEach(function(d){html+="<div class=\\"hist-day\\"><div class=\\"hist-date\\">"+esc(d)+"<b>"+groups[d].length+"건</b></div>";' +
   'groups[d].forEach(function(it){html+="<div class=\\"hist-item\\">"+' +
-  '"<div class=\\"hist-info\\"><span class=\\"hi-main\\">"+esc(it.date)+" "+esc(it.time||"")+" 발급</span>"+' +
+  '"<div class=\\"hist-info\\"><span class=\\"hi-main\\">시작일 : "+esc(fmtFrom(it.from))+"</span>"+' +
   '"<span class=\\"hi-sub\\">마감 "+esc(it.end)+"</span></div>"+' +
   '"<div class=\\"hist-acts\\"><a class=\\"hist-go\\" href=\\""+esc(it.link)+"\\" target=\\"_blank\\" rel=\\"noopener\\">바로가기</a>"+' +
   '"<button class=\\"hist-copy\\" type=\\"button\\">복사</button>"+' +
