@@ -18,7 +18,7 @@
       --f: 'Pretendard', -apple-system, sans-serif;
     }
     html, body { width: 100%; }
-    body { font-family: var(--f); background: var(--bg); min-height: 100vh; padding-top: 40px; padding-bottom: 90px; }
+    body { font-family: var(--f); background: var(--bg); min-height: 100vh; padding-top: 0; padding-bottom: 90px; }
 
     /* ── 레이아웃 ── */
     .page { max-width: 480px; margin: 0 auto; }
@@ -32,17 +32,40 @@
     .header h1 { font-size: 20px; font-weight: 700; color: var(--g900); line-height: 1.4; }
     .header p { font-size: 14px; color: var(--g500); margin-top: 4px; }
 
-    /* ── D-DAY 바 ── */
+    /* ── 스티키 슬림 바 (스크롤 시 등장) ── */
     #dbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-      height: 40px; background: var(--sur); border-bottom: 1px solid var(--bdr);
-      display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+      height: 40px; background: var(--g900);
+      display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 16px;
+      transform: translateY(-100%); transition: transform .25s ease;
     }
-    .dbar-back { font-size: 13px; font-weight: 600; color: var(--pri); text-decoration: none; display: flex; align-items: center; gap: 4px; }
-    .dbar-mid  { display: flex; align-items: center; gap: 8px; }
-    .dbar-mid .dn { font-size: 15px; font-weight: 800; color: var(--teal); letter-spacing: -.3px; }
-    .dbar-mid .ds { font-size: 13px; font-weight: 500; color: var(--g500); }
-    .dbar-r    { width: 48px; }
+    #dbar.show { transform: translateY(0); }
+    #dbar .dbar-tag { font-size: 12px; font-weight: 800; color: #fff; background: var(--err); padding: 3px 9px; border-radius: 999px; letter-spacing: -.2px; }
+    #dbar .dn { font-size: 14px; font-weight: 800; color: #fff; letter-spacing: -.3px; }
+    #dbar .ds { font-size: 13px; font-weight: 600; color: #FFD7DB; font-variant-numeric: tabular-nums; }
+
+    /* ── 5,5 히어로 (#1) ── */
+    .hero5 { background: linear-gradient(180deg, var(--sur) 0%, var(--teal-bg) 100%); border-bottom: 1px solid var(--bdr); }
+    .hero5-in { max-width: 480px; margin: 0 auto; padding: 22px 20px 26px; text-align: center; }
+    .hero5-logo { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; }
+    .hero5-logo img { height: 24px; width: auto; }
+    .hero5-logo span { font-size: 13px; font-weight: 700; color: var(--g700); }
+    .hero5-badge { display: inline-block; font-size: 13px; font-weight: 800; color: #fff; background: var(--teal); padding: 6px 14px; border-radius: 999px; letter-spacing: .3px; margin-bottom: 14px; }
+    .hero5-title { font-size: 24px; font-weight: 800; color: var(--g900); line-height: 1.3; letter-spacing: -.5px; }
+    .hero5-sub { font-size: 15px; color: var(--g600); margin-top: 6px; }
+    .hero5-sub b { color: var(--err-str); font-weight: 800; }
+    .hero5-cd { display: flex; align-items: flex-start; justify-content: center; gap: 6px; margin-top: 20px; }
+    .hero5-cd .cd-u { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .hero5-cd .cd-n { font-size: 34px; font-weight: 800; color: var(--g900); font-variant-numeric: tabular-nums; line-height: 1; background: var(--sur); border: 1px solid var(--bdr); border-radius: 10px; padding: 10px 8px; min-width: 52px; }
+    .hero5-cd .cd-l { font-size: 11px; font-weight: 600; color: var(--g500); }
+    .hero5-cd .cd-sep { font-size: 26px; font-weight: 800; color: var(--g300); line-height: 1.5; }
+    .hero5-cd-msg { font-size: 12px; font-weight: 600; color: var(--err-str); margin-top: 12px; }
+    .hero5-price { display: inline-flex; align-items: baseline; gap: 10px; margin-top: 22px; }
+    .hero5-price .p-old { font-size: 19px; color: var(--g500); text-decoration: line-through; font-weight: 600; }
+    .hero5-price .p-arrow { font-size: 20px; color: var(--g400); }
+    .hero5-price .p-now { font-size: 42px; font-weight: 800; color: var(--teal); letter-spacing: -1px; }
+    .hero5-price .p-now small { font-size: 15px; font-weight: 700; color: var(--g500); margin-left: 4px; }
+    .hero5.expired .hero5-cd, .hero5.expired .hero5-cd-msg { display: none; }
 
     /* ── 상태 배너 ── */
     .status-banner { max-width: 480px; margin: 8px auto 0; padding: 0 0; }
@@ -186,14 +209,11 @@
 </head>
 <body>
 
-<!-- D-DAY 바 -->
+<!-- 스티키 슬림 바 (스크롤 시 등장) -->
 <div id="dbar">
-  <a href="./index.html" id="backLink" class="dbar-back">← 상세보기</a>
-  <div class="dbar-mid">
-    <span class="dn" id="dbarN"></span>
-    <span class="ds" id="dbarS"></span>
-  </div>
-  <div class="dbar-r"></div>
+  <span class="dbar-tag">원장님 전용 · 5일 한정</span>
+  <span class="dn" id="dbarN"></span>
+  <span class="ds" id="dbarS"></span>
 </div>
 
 <!-- 비활성 화면 -->
@@ -222,15 +242,30 @@
 <div id="formArea" style="display:none;">
   <div class="page">
 
-    <!-- 헤더 -->
-    <div class="header">
-      <div class="header-inner">
-        <div class="header-logo">
+    <!-- 5,5 히어로 (#1) -->
+    <div class="hero5" id="hero5">
+      <div class="hero5-in">
+        <div class="hero5-logo">
           <img src="assets/U_ALF.png" alt="고방">
-          <span class="header-logo-text">고방 블로그 마케팅</span>
+          <span>고방 블로그 마케팅</span>
         </div>
-        <h1>블로그 작성 신청서</h1>
-        <p>원장님 전용가 10만원 · 키워드와 지점 정보를 입력해 주세요</p>
+        <h1 class="hero5-title">원장님 전용 · 5일 한정</h1>
+        <p class="hero5-sub">이미 함께해 주신 원장님께만 <b>5만원 할인</b></p>
+        <div class="hero5-cd" id="hero5cd">
+          <div class="cd-u"><span class="cd-n" id="h5D">00</span><span class="cd-l">일</span></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-u"><span class="cd-n" id="h5H">00</span><span class="cd-l">시</span></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-u"><span class="cd-n" id="h5M">00</span><span class="cd-l">분</span></div>
+          <span class="cd-sep">:</span>
+          <div class="cd-u"><span class="cd-n" id="h5S">00</span><span class="cd-l">초</span></div>
+        </div>
+        <div class="hero5-cd-msg" id="h5Msg">마감까지 남은 시간</div>
+        <div class="hero5-price">
+          <span class="p-old">정가 15만원</span>
+          <span class="p-arrow">→</span>
+          <span class="p-now">10만원<small>VAT 별도</small></span>
+        </div>
       </div>
     </div>
 
@@ -458,30 +493,55 @@
     var from = p.get('from');
     if (from && /^\d{8}$/.test(from)) {
       var d = from.slice(0,4) + '-' + from.slice(4,6) + '-' + from.slice(6,8);
-      END_DATE = new Date(new Date(d + 'T00:00:00+09:00').getTime() + 7 * 86400000);
+      // 5,5 이벤트 — 시작일 +5일이 마감
+      END_DATE = new Date(new Date(d + 'T00:00:00+09:00').getTime() + 5 * 86400000);
     }
-    // backLink에 ?from= 전달
-    var back = document.getElementById('backLink');
-    back.href = './index.html' + (from ? '?from=' + from : '');
   })();
 
   function isExpired() { return !END_DATE || new Date() > END_DATE; }
 
   function pad(n) { return String(n).padStart(2,'0'); }
-  function updateDbar() {
-    var n = document.getElementById('dbarN'); var s = document.getElementById('dbarS');
-    if (!END_DATE || isExpired()) { n.textContent = ''; s.textContent = ''; return; }
+  function setText(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+
+  function updateCountdown() {
+    var hero = document.getElementById('hero5');
+    if (!END_DATE || isExpired()) {
+      if (hero) hero.classList.add('expired');
+      setText('h5Msg', END_DATE ? '이벤트가 종료됐어요' : '');
+      setText('dbarN', ''); setText('dbarS', '');
+      return;
+    }
     var ms   = END_DATE - new Date();
     var days = Math.floor(ms / 86400000);
     var hrs  = Math.floor((ms % 86400000) / 3600000);
     var mins = Math.floor((ms % 3600000)  / 60000);
     var secs = Math.floor((ms % 60000)    / 1000);
-    n.textContent = days === 0 ? '오늘 마감' : 'D-' + days;
-    s.textContent = days === 0
+    // 히어로 대형 카운트다운
+    setText('h5D', pad(days)); setText('h5H', pad(hrs));
+    setText('h5M', pad(mins)); setText('h5S', pad(secs));
+    setText('h5Msg', days === 0 ? '오늘 자정 마감' : '마감까지 남은 시간');
+    // 슬림 바
+    setText('dbarN', days === 0 ? '오늘 마감' : 'D-' + days);
+    setText('dbarS', days === 0
       ? '· ' + pad(hrs) + ':' + pad(mins) + ':' + pad(secs) + ' 남음'
-      : '· ' + days + '일 ' + pad(hrs) + ':' + pad(mins) + ' 남음';
+      : '· ' + days + '일 ' + pad(hrs) + ':' + pad(mins) + ' 남음');
   }
-  updateDbar(); setInterval(updateDbar, 1000);
+  updateCountdown(); setInterval(updateCountdown, 1000);
+
+  // 히어로가 화면에서 사라지면 슬림 바 등장
+  (function() {
+    var hero = document.getElementById('hero5');
+    var dbar = document.getElementById('dbar');
+    if (!hero || !dbar) return;
+    function onScroll() {
+      var r = hero.getBoundingClientRect();
+      // 히어로가 렌더된(높이>0) 상태에서 화면 위로 사라졌을 때만 슬림 바 노출
+      dbar.classList.toggle('show', r.height > 0 && r.bottom <= 0);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.__syncDbar = onScroll;
+    onScroll();
+  })();
 
   function callAPI(action, params) {
     return fetch(GAS_URL, { method: 'POST', body: JSON.stringify(Object.assign({ action: action }, params || {})) }).then(function(r){ return r.json(); });
@@ -493,6 +553,7 @@
       document.getElementById('offScreen').style.display = 'flex'; return;
     }
     document.getElementById('formArea').style.display = 'block';
+    if (window.__syncDbar) window.__syncDbar();
     callAPI('checkAccess').then(function(d) {
       if (!d.ok) { document.getElementById('formArea').style.display = 'none'; document.getElementById('offMsg').textContent = d.reason; document.getElementById('offScreen').style.display = 'flex'; return; }
       if (d.maxCount > 0) {
