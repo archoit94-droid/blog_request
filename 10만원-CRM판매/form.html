@@ -60,11 +60,13 @@
     .hero5-cd .cd-l { font-size: 11px; font-weight: 600; color: var(--g500); }
     .hero5-cd .cd-sep { font-size: 26px; font-weight: 800; color: var(--g300); line-height: 1.5; }
     .hero5-cd-msg { font-size: 12px; font-weight: 600; color: var(--err-str); margin-top: 12px; }
-    .p-save { display: inline-block; margin-top: 22px; font-size: 13px; font-weight: 800; color: #fff; background: var(--err); padding: 6px 15px; border-radius: 999px; letter-spacing: -.2px; }
-    .hero5-price { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 12px; }
-    .hero5-price .p-old { font-size: 17px; color: var(--g500); text-decoration: line-through; font-weight: 600; }
-    .hero5-price .p-now { font-size: 42px; font-weight: 800; color: var(--teal); letter-spacing: -1px; line-height: 1.1; }
-    .hero5-price .p-now small { font-size: 15px; font-weight: 700; color: var(--g500); margin-left: 4px; }
+    /* 배지 + 가격 = 한 묶음 (#2) */
+    .hero5-offer { margin-top: 26px; display: flex; flex-direction: column; align-items: center; }
+    .p-save { display: inline-block; font-size: 13px; font-weight: 800; color: #fff; background: var(--err); padding: 7px 16px; border-radius: 999px; letter-spacing: -.2px; }
+    .hero5-price { display: flex; flex-direction: column; align-items: center; gap: 9px; margin-top: 12px; }
+    .hero5-price .p-old { font-size: 16px; color: var(--g500); text-decoration: line-through; font-weight: 600; letter-spacing: .2px; }
+    .hero5-price .p-now { display: flex; align-items: baseline; justify-content: center; gap: 13px; font-size: 46px; font-weight: 800; color: var(--teal); letter-spacing: -.5px; line-height: 1; }
+    .hero5-price .p-now small { font-size: 14px; font-weight: 700; color: var(--g500); letter-spacing: 0; }
     .hero5.expired .hero5-cd, .hero5.expired .hero5-cd-msg { display: none; }
 
     /* ── 상태 배너 ── */
@@ -84,11 +86,11 @@
     .adv-more:hover { background: var(--pri-100); }
 
     /* ── 섹션 ── */
-    .form-divider { text-align: center; padding: 30px 20px 22px; margin-top: 8px; background: var(--bg); border-top: 1px solid var(--bdr); border-bottom: 1px solid var(--bdr); }
+    .form-divider { text-align: center; padding: 26px 20px 24px; margin: 16px 12px 0; background: linear-gradient(180deg, var(--info) 0%, var(--sur) 100%); border: 1px solid var(--bdr); border-radius: 18px; }
     .form-divider .fd-line { width: 40px; height: 3px; background: var(--teal); border-radius: 2px; margin: 0 auto 14px; }
     .form-divider .fd-title { font-size: 18px; font-weight: 800; color: var(--g900); letter-spacing: -.3px; }
     .form-divider .fd-sub { font-size: 14px; color: var(--g600); margin-top: 5px; }
-    .sec { background: var(--sur); margin-top: 8px; padding: 20px 20px 16px; }
+    .sec { background: var(--sur); margin: 10px 12px 0; padding: 20px 18px 16px; border: 1px solid var(--bdr); border-radius: 18px; }
     .sec-title { font-size: 11px; font-weight: 700; color: var(--g500); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 14px; }
     .field { margin-bottom: 16px; }
     .field:last-child { margin-bottom: 0; }
@@ -277,10 +279,12 @@
           <div class="cd-u"><span class="cd-n" id="h5S">00</span><span class="cd-l">초</span></div>
         </div>
         <div class="hero5-cd-msg" id="h5Msg">마감까지 남은 시간</div>
-        <div class="p-save">블로그상품 5만원 즉시 할인</div>
-        <div class="hero5-price">
-          <span class="p-old">정가 15만원</span>
-          <span class="p-now">10만원<small>VAT 별도</small></span>
+        <div class="hero5-offer">
+          <div class="p-save">블로그상품 5만원 즉시 할인</div>
+          <div class="hero5-price">
+            <span class="p-old">정가 15만원</span>
+            <span class="p-now">10만원<small>VAT 별도</small></span>
+          </div>
         </div>
       </div>
     </div>
@@ -316,7 +320,7 @@
       </div>
 
       <!-- 안내 -->
-      <div class="sec" style="margin-top:0;">
+      <div class="sec">
         <div class="notice">
           <ul>
             <li>사진은 고방에 등록된 지점 사진만 사용됩니다. 추가는 <a href="https://u-ceo.kr/login" target="_blank">u-ceo.kr</a>에서 미리 올려 주세요.</li>

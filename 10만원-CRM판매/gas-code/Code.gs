@@ -170,11 +170,14 @@ function renderLinkGenerator() {
   '.hist-h{font-size:14px;font-weight:800;color:#191F28;margin:36px 0 14px;padding-top:24px;border-top:1px solid #E5E8EB}' +
   '.hist-day{margin-bottom:18px}' +
   '.hist-date{font-size:12px;font-weight:700;color:#8B95A1;margin-bottom:9px}.hist-date b{color:#3182F6;font-weight:700;margin-left:5px}' +
-  '.hist-item{background:#fff;border:1px solid #E5E8EB;border-radius:10px;padding:11px 13px;margin-bottom:8px}' +
-  '.hist-link{font-size:12px;word-break:break-all;color:#1B6CF2;line-height:1.45}' +
-  '.hist-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px}' +
-  '.hist-meta .hm{font-size:12px;color:#8B95A1}' +
-  '.hist-copy{width:auto;padding:6px 13px;font-size:12px;background:#F2F4F6;color:#4A5568}' +
+  '.hist-item{background:#fff;border:1px solid #E5E8EB;border-radius:12px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px}' +
+  '.hist-info{display:flex;flex-direction:column;gap:3px;min-width:0}' +
+  '.hi-end{font-size:14px;font-weight:700;color:#191F28}' +
+  '.hi-time{font-size:12px;color:#8B95A1}' +
+  '.hist-acts{display:flex;gap:7px;flex-shrink:0}' +
+  '.hist-go,.hist-copy{width:auto;padding:8px 14px;font-size:13px;font-weight:700;border-radius:9px;cursor:pointer;text-decoration:none;display:inline-block;line-height:1;border:none}' +
+  '.hist-go{background:#3182F6;color:#fff}' +
+  '.hist-copy{background:#F2F4F6;color:#4A5568;border:1px solid #E5E8EB}' +
   '.hist-empty{font-size:13px;color:#B0B8C1;text-align:center;padding:22px 0}' +
   '</style></head><body><div class="wrap">' +
   '<h1>신청 링크 발급</h1>' +
@@ -195,11 +198,13 @@ function renderLinkGenerator() {
   'var groups={},order=[];LOG.forEach(function(it){if(!groups[it.date]){groups[it.date]=[];order.push(it.date);}groups[it.date].push(it);});' +
   'var html="<div class=\\"hist-h\\">발급 이력 ("+LOG.length+")</div>";' +
   'order.forEach(function(d){html+="<div class=\\"hist-day\\"><div class=\\"hist-date\\">"+esc(d)+"<b>"+groups[d].length+"건</b></div>";' +
-  'groups[d].forEach(function(it){html+="<div class=\\"hist-item\\"><div class=\\"hist-link\\">"+esc(it.link)+"</div>"+' +
-  '"<div class=\\"hist-meta\\"><span class=\\"hm\\">"+esc(it.time||"")+" 발급 · 마감 "+esc(it.end)+"</span>"+' +
-  '"<button class=\\"hist-copy\\">복사</button></div></div>";});html+="</div>";});h.innerHTML=html;}' +
+  'groups[d].forEach(function(it){html+="<div class=\\"hist-item\\">"+' +
+  '"<div class=\\"hist-info\\"><span class=\\"hi-end\\">마감 "+esc(it.end)+"</span>"+' +
+  '"<span class=\\"hi-time\\">"+esc(it.time||"")+" 발급</span></div>"+' +
+  '"<div class=\\"hist-acts\\"><a class=\\"hist-go\\" href=\\""+esc(it.link)+"\\" target=\\"_blank\\" rel=\\"noopener\\">바로가기</a>"+' +
+  '"<button class=\\"hist-copy\\" type=\\"button\\">복사</button></div></div>";});html+="</div>";});h.innerHTML=html;}' +
   'document.getElementById("hist").addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".hist-copy");if(!b)return;' +
-  'var lk=b.closest(".hist-item").querySelector(".hist-link").innerText;navigator.clipboard.writeText(lk).then(showToast);});' +
+  'var lk=b.closest(".hist-item").querySelector(".hist-go").getAttribute("href");navigator.clipboard.writeText(lk).then(showToast);});' +
   'function g(){var tk=document.getElementById("tk").value.trim();var v=document.getElementById("dt").value;' +
   'if(!tk){alert("토큰을 입력하세요");return;}if(!v){alert("날짜를 선택하세요");return;}' +
   'sessionStorage.setItem("gentk",tk);var b=document.getElementById("gb");b.disabled=true;b.textContent="생성 중...";' +
