@@ -148,6 +148,19 @@ function getGenLog_() {
   } catch (e) { return []; }
 }
 
+// 발급 이력 삭제 (운영자 토큰 필요) — link 기준 1건 제거. 발급된 링크 자체의 유효성은 서명/기간으로 별도 보장되므로, 이력에서만 지운다.
+function deleteGenLink(token, link) {
+  if (!checkInboxToken_(token)) return { ok: false, reason: 'unauthorized' };
+  if (!link) return { ok: false, reason: 'invalid' };
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var arr = JSON.parse(props.getProperty('GEN_LOG') || '[]');
+    var next = arr.filter(function(it) { return it.link !== link; });
+    props.setProperty('GEN_LOG', JSON.stringify(next));
+    return { ok: true, removed: arr.length - next.length };
+  } catch (e) { return { ok: false, reason: 'error' }; }
+}
+
 // 운영자용 발급 페이지 — 웹앱 URL 뒤에 ?gen 을 붙여 접속. 토큰+날짜 입력 시 genLink 호출.
 function renderLinkGenerator() {
   var SELF = ScriptApp.getService().getUrl();
@@ -172,12 +185,14 @@ function renderLinkGenerator() {
   '.hist-date{font-size:12px;font-weight:700;color:#8B95A1;margin-bottom:9px}.hist-date b{color:#3182F6;font-weight:700;margin-left:5px}' +
   '.hist-item{background:#fff;border:1px solid #E5E8EB;border-radius:12px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px}' +
   '.hist-info{display:flex;flex-direction:column;gap:3px;min-width:0}' +
-  '.hi-end{font-size:14px;font-weight:700;color:#191F28}' +
-  '.hi-time{font-size:12px;color:#8B95A1}' +
+  '.hi-main{font-size:14px;font-weight:700;color:#191F28}' +
+  '.hi-sub{font-size:12px;color:#8B95A1}' +
   '.hist-acts{display:flex;gap:7px;flex-shrink:0}' +
-  '.hist-go,.hist-copy{width:auto;padding:8px 14px;font-size:13px;font-weight:700;border-radius:9px;cursor:pointer;text-decoration:none;display:inline-block;line-height:1;border:none}' +
+  '.hist-go,.hist-copy,.hist-del{width:auto;padding:8px 13px;font-size:13px;font-weight:700;border-radius:9px;cursor:pointer;text-decoration:none;display:inline-block;line-height:1;border:none}' +
   '.hist-go{background:#3182F6;color:#fff}' +
   '.hist-copy{background:#F2F4F6;color:#4A5568;border:1px solid #E5E8EB}' +
+  '.hist-del{background:#FFF0F2;color:#D92B2B;border:1px solid #FAD7DB}' +
+  '.hist-del:disabled{opacity:.5;cursor:default}' +
   '.hist-empty{font-size:13px;color:#B0B8C1;text-align:center;padding:22px 0}' +
   '</style></head><body><div class="wrap">' +
   '<h1>신청 링크 발급</h1>' +
@@ -193,18 +208,30 @@ function renderLinkGenerator() {
   '(function(){var d=new Date();document.getElementById("dt").value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");' +
   'var s=sessionStorage.getItem("gentk");if(s)document.getElementById("tk").value=s;renderHist();})();' +
   'function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}' +
-  'function showToast(){var e=document.getElementById("toast");e.classList.add("on");setTimeout(function(){e.classList.remove("on");},1400);}' +
+  'function showToastMsg(m){var e=document.getElementById("toast");e.textContent=m;e.classList.add("on");setTimeout(function(){e.classList.remove("on");},1400);}' +
+  'function showToast(){showToastMsg("복사됐어요");}' +
   'function renderHist(){var h=document.getElementById("hist");if(!LOG.length){h.innerHTML="";return;}' +
   'var groups={},order=[];LOG.forEach(function(it){if(!groups[it.date]){groups[it.date]=[];order.push(it.date);}groups[it.date].push(it);});' +
   'var html="<div class=\\"hist-h\\">발급 이력 ("+LOG.length+")</div>";' +
   'order.forEach(function(d){html+="<div class=\\"hist-day\\"><div class=\\"hist-date\\">"+esc(d)+"<b>"+groups[d].length+"건</b></div>";' +
   'groups[d].forEach(function(it){html+="<div class=\\"hist-item\\">"+' +
-  '"<div class=\\"hist-info\\"><span class=\\"hi-end\\">마감 "+esc(it.end)+"</span>"+' +
-  '"<span class=\\"hi-time\\">"+esc(it.time||"")+" 발급</span></div>"+' +
+  '"<div class=\\"hist-info\\"><span class=\\"hi-main\\">"+esc(it.date)+" "+esc(it.time||"")+" 발급</span>"+' +
+  '"<span class=\\"hi-sub\\">마감 "+esc(it.end)+"</span></div>"+' +
   '"<div class=\\"hist-acts\\"><a class=\\"hist-go\\" href=\\""+esc(it.link)+"\\" target=\\"_blank\\" rel=\\"noopener\\">바로가기</a>"+' +
-  '"<button class=\\"hist-copy\\" type=\\"button\\">복사</button></div></div>";});html+="</div>";});h.innerHTML=html;}' +
-  'document.getElementById("hist").addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".hist-copy");if(!b)return;' +
-  'var lk=b.closest(".hist-item").querySelector(".hist-go").getAttribute("href");navigator.clipboard.writeText(lk).then(showToast);});' +
+  '"<button class=\\"hist-copy\\" type=\\"button\\">복사</button>"+' +
+  '"<button class=\\"hist-del\\" type=\\"button\\">삭제</button></div></div>";});html+="</div>";});h.innerHTML=html;}' +
+  'document.getElementById("hist").addEventListener("click",function(e){var t=e.target;' +
+  'var cp=t.closest&&t.closest(".hist-copy");var dl=t.closest&&t.closest(".hist-del");' +
+  'if(cp){var lk=cp.closest(".hist-item").querySelector(".hist-go").getAttribute("href");navigator.clipboard.writeText(lk).then(showToast);return;}' +
+  'if(dl){var lk2=dl.closest(".hist-item").querySelector(".hist-go").getAttribute("href");' +
+  'if(!confirm("이 발급 이력을 삭제할까요?"))return;' +
+  'var tk=document.getElementById("tk").value.trim()||sessionStorage.getItem("gentk")||"";' +
+  'if(!tk){alert("운영자 토큰을 입력하세요");return;}' +
+  'dl.disabled=true;dl.textContent="삭제 중...";' +
+  'fetch(SELF,{method:"POST",body:JSON.stringify({action:"deleteGenLink",token:tk,link:lk2})}).then(function(r){return r.json();}).then(function(d){' +
+  'if(!d.ok){dl.disabled=false;dl.textContent="삭제";alert(d.reason==="unauthorized"?"토큰이 올바르지 않습니다.":"삭제에 실패했어요");return;}' +
+  'LOG=LOG.filter(function(x){return x.link!==lk2;});renderHist();showToastMsg("삭제됐어요");' +
+  '}).catch(function(){dl.disabled=false;dl.textContent="삭제";alert("오류가 발생했어요");});return;}});' +
   'function g(){var tk=document.getElementById("tk").value.trim();var v=document.getElementById("dt").value;' +
   'if(!tk){alert("토큰을 입력하세요");return;}if(!v){alert("날짜를 선택하세요");return;}' +
   'sessionStorage.setItem("gentk",tk);var b=document.getElementById("gb");b.disabled=true;b.textContent="생성 중...";' +
@@ -251,6 +278,8 @@ function doPost(e) {
       result = submitForm(payload);
     } else if (action === 'genLink') {
       result = genLink(payload.token, payload.from);
+    } else if (action === 'deleteGenLink') {
+      result = deleteGenLink(payload.token, payload.link);
     } else if (action === 'listRequests') {
       result = listRequests(payload.token);
     } else if (action === 'sendPaymentLink') {
