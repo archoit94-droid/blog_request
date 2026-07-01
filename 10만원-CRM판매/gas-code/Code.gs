@@ -109,15 +109,12 @@ function doGet(e) {
   if (e && e.parameter && e.parameter.gen !== undefined) {
     return renderLinkGenerator();
   }
-  if (e && e.parameter && e.parameter.s) {
-    return renderRedirect_(e.parameter.s);
-  }
   return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 // 서명 링크 발급 (운영자 토큰 필요) — 무인증 발급을 막아 서명 방어를 유지한다.
-// 실제 배포 링크는 GAS 자체 단축코드(?s=)로 발급 — 클릭 시 doGet에서 집계 후 원본 서명링크로 리다이렉트.
+// 실제 배포 링크는 GitHub Pages 단축 리다이렉트 페이지(r10/?c=코드) — GAS exec URL은 100자 넘어 알림톡 변수 제한에 걸림.
 function genLink(token, from) {
   if (!checkInboxToken_(token)) return { ok: false, reason: 'unauthorized' };
   from = String(from || '');
@@ -125,7 +122,7 @@ function genLink(token, from) {
   var fullLink = encodeURI(FORM_BASE_URL) + '?from=' + from + '&sig=' + makeSig(from);
   var end  = Utilities.formatDate(linkEndDate(from), 'Asia/Seoul', 'yyyy.MM.dd');
   var code = genShortCode_();
-  var shortLink = ScriptApp.getService().getUrl() + '?s=' + code;
+  var shortLink = 'https://gobangmkt.github.io/blog_request/r10/?c=' + code;
   var now = new Date();
   logGenLink_({
     date: Utilities.formatDate(now, 'Asia/Seoul', 'yyyy.MM.dd'),
@@ -150,27 +147,18 @@ function genShortCode_() {
   return code;
 }
 
-// 단축코드 클릭 → 집계 후 원본 서명링크로 리다이렉트(Apps Script 웹앱은 실 302 대신 meta/JS 리다이렉트 사용)
-function renderRedirect_(code) {
+// 단축코드 → 원본 서명링크 조회 + 클릭 집계. GitHub Pages r10/ 리다이렉트 페이지가 호출.
+function resolveShortCode(code) {
   var arr = getGenLog_();
   var item = null;
   for (var i = 0; i < arr.length; i++) {
     if (arr[i].code === code) { item = arr[i]; break; }
   }
-  if (!item || !item.fullLink) {
-    return HtmlService.createHtmlOutput(
-      '<!doctype html><meta charset="utf-8"><body style="font-family:-apple-system,sans-serif;padding:60px 20px;text-align:center;color:#8B95A1">유효하지 않은 링크예요.</body>'
-    );
-  }
+  if (!item || !item.fullLink) return { ok: false };
   item.clicks = (item.clicks || 0) + 1;
   item.lastClickAt = Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss');
   saveGenLog_(arr);
-  var target = item.fullLink;
-  return HtmlService.createHtmlOutput(
-    '<!doctype html><html><head><meta charset="utf-8">' +
-    '<meta http-equiv="refresh" content="0;url=' + target + '"></head>' +
-    '<body><script>location.replace(' + JSON.stringify(target) + ');</script></body></html>'
-  );
+  return { ok: true, fullLink: item.fullLink };
 }
 
 // 발급 이력 누적 — 스크립트 속성에 JSON 배열로 보관(최신순, 최대 300건). 시트 불필요, ?gen 페이지에서 바로 조회.
@@ -323,6 +311,8 @@ function doPost(e) {
       result = submitForm(payload);
     } else if (action === 'genLink') {
       result = genLink(payload.token, payload.from);
+    } else if (action === 'resolveShortCode') {
+      result = resolveShortCode(payload.code);
     } else if (action === 'deleteGenLink') {
       result = deleteGenLink(payload.token, payload.link);
     } else if (action === 'listRequests') {
