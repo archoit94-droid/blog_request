@@ -109,37 +109,76 @@ function doGet(e) {
   if (e && e.parameter && e.parameter.gen !== undefined) {
     return renderLinkGenerator();
   }
+  if (e && e.parameter && e.parameter.s) {
+    return renderRedirect_(e.parameter.s);
+  }
   return ContentService.createTextOutput(JSON.stringify({ status: 'ok' }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 // 서명 링크 발급 (운영자 토큰 필요) — 무인증 발급을 막아 서명 방어를 유지한다.
+// 실제 배포 링크는 GAS 자체 단축코드(?s=)로 발급 — 클릭 시 doGet에서 집계 후 원본 서명링크로 리다이렉트.
 function genLink(token, from) {
   if (!checkInboxToken_(token)) return { ok: false, reason: 'unauthorized' };
   from = String(from || '');
   if (!/^\d{8}$/.test(from)) return { ok: false, reason: 'invalid_date' };
-  var link = encodeURI(FORM_BASE_URL) + '?from=' + from + '&sig=' + makeSig(from);
+  var fullLink = encodeURI(FORM_BASE_URL) + '?from=' + from + '&sig=' + makeSig(from);
   var end  = Utilities.formatDate(linkEndDate(from), 'Asia/Seoul', 'yyyy.MM.dd');
-  logGenLink_(from, link, end);
-  return { ok: true, link: link, end: end };
+  var code = genShortCode_();
+  var shortLink = ScriptApp.getService().getUrl() + '?s=' + code;
+  var now = new Date();
+  logGenLink_({
+    date: Utilities.formatDate(now, 'Asia/Seoul', 'yyyy.MM.dd'),
+    time: Utilities.formatDate(now, 'Asia/Seoul', 'HH:mm'),
+    from: from,
+    end: end,
+    code: code,
+    link: shortLink,
+    fullLink: fullLink,
+    clicks: 0
+  });
+  return { ok: true, link: shortLink, end: end };
+}
+
+// 발급 이력에 없는 코드로 중복되지 않는 7자 단축코드 생성
+function genShortCode_() {
+  var arr = getGenLog_();
+  var used = {};
+  arr.forEach(function(it) { if (it.code) used[it.code] = true; });
+  var code;
+  do { code = Utilities.getUuid().replace(/-/g, '').slice(0, 7); } while (used[code]);
+  return code;
+}
+
+// 단축코드 클릭 → 집계 후 원본 서명링크로 리다이렉트(Apps Script 웹앱은 실 302 대신 meta/JS 리다이렉트 사용)
+function renderRedirect_(code) {
+  var arr = getGenLog_();
+  var item = null;
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i].code === code) { item = arr[i]; break; }
+  }
+  if (!item || !item.fullLink) {
+    return HtmlService.createHtmlOutput(
+      '<!doctype html><meta charset="utf-8"><body style="font-family:-apple-system,sans-serif;padding:60px 20px;text-align:center;color:#8B95A1">유효하지 않은 링크예요.</body>'
+    );
+  }
+  item.clicks = (item.clicks || 0) + 1;
+  item.lastClickAt = Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss');
+  saveGenLog_(arr);
+  var target = item.fullLink;
+  return HtmlService.createHtmlOutput(
+    '<!doctype html><html><head><meta charset="utf-8">' +
+    '<meta http-equiv="refresh" content="0;url=' + target + '"></head>' +
+    '<body><script>location.replace(' + JSON.stringify(target) + ');</script></body></html>'
+  );
 }
 
 // 발급 이력 누적 — 스크립트 속성에 JSON 배열로 보관(최신순, 최대 300건). 시트 불필요, ?gen 페이지에서 바로 조회.
-function logGenLink_(from, link, end) {
-  try {
-    var props = PropertiesService.getScriptProperties();
-    var arr = JSON.parse(props.getProperty('GEN_LOG') || '[]');
-    var now = new Date();
-    arr.unshift({
-      date: Utilities.formatDate(now, 'Asia/Seoul', 'yyyy.MM.dd'),
-      time: Utilities.formatDate(now, 'Asia/Seoul', 'HH:mm'),
-      from: from,
-      end:  end,
-      link: link
-    });
-    if (arr.length > 300) arr = arr.slice(0, 300);
-    props.setProperty('GEN_LOG', JSON.stringify(arr));
-  } catch (e) {}
+function logGenLink_(entry) {
+  var arr = getGenLog_();
+  arr.unshift(entry);
+  if (arr.length > 300) arr = arr.slice(0, 300);
+  saveGenLog_(arr);
 }
 
 function getGenLog_() {
@@ -148,15 +187,20 @@ function getGenLog_() {
   } catch (e) { return []; }
 }
 
+function saveGenLog_(arr) {
+  try {
+    PropertiesService.getScriptProperties().setProperty('GEN_LOG', JSON.stringify(arr));
+  } catch (e) {}
+}
+
 // 발급 이력 삭제 (운영자 토큰 필요) — link 기준 1건 제거. 발급된 링크 자체의 유효성은 서명/기간으로 별도 보장되므로, 이력에서만 지운다.
 function deleteGenLink(token, link) {
   if (!checkInboxToken_(token)) return { ok: false, reason: 'unauthorized' };
   if (!link) return { ok: false, reason: 'invalid' };
   try {
-    var props = PropertiesService.getScriptProperties();
-    var arr = JSON.parse(props.getProperty('GEN_LOG') || '[]');
+    var arr = getGenLog_();
     var next = arr.filter(function(it) { return it.link !== link; });
-    props.setProperty('GEN_LOG', JSON.stringify(next));
+    saveGenLog_(next);
     return { ok: true, removed: arr.length - next.length };
   } catch (e) { return { ok: false, reason: 'error' }; }
 }
@@ -217,7 +261,7 @@ function renderLinkGenerator() {
   'order.forEach(function(d){html+="<div class=\\"hist-day\\"><div class=\\"hist-date\\">"+esc(d)+"<b>"+groups[d].length+"건</b></div>";' +
   'groups[d].forEach(function(it){html+="<div class=\\"hist-item\\">"+' +
   '"<div class=\\"hist-info\\"><span class=\\"hi-main\\">시작일 : "+esc(fmtFrom(it.from))+"</span>"+' +
-  '"<span class=\\"hi-sub\\">마감 "+esc(it.end)+"</span></div>"+' +
+  '"<span class=\\"hi-sub\\">마감 "+esc(it.end)+" · 클릭 "+(it.clicks!=null?it.clicks:"집계 전")+(it.clicks!=null?"회":"")+"</span></div>"+' +
   '"<div class=\\"hist-acts\\"><a class=\\"hist-go\\" href=\\""+esc(it.link)+"\\" target=\\"_blank\\" rel=\\"noopener\\">바로가기</a>"+' +
   '"<button class=\\"hist-copy\\" type=\\"button\\">복사</button>"+' +
   '"<button class=\\"hist-del\\" type=\\"button\\">삭제</button></div></div>";});html+="</div>";});h.innerHTML=html;}' +
@@ -242,7 +286,7 @@ function renderLinkGenerator() {
   'o.innerHTML="<div class=\\"card\\"><div class=\\"lbl\\">발급된 신청 링크</div><div class=\\"link\\" id=\\"lnk\\">"+d.link+"</div>"+' +
   '"<button class=\\"copy\\" onclick=\\"cp()\\">링크 복사</button><div class=\\"meta\\">마감 "+d.end+" · 발급일 +5일</div></div>";' +
   'var n=new Date(),p=function(x){return String(x).padStart(2,"0");};' +
-  'LOG.unshift({date:n.getFullYear()+"."+p(n.getMonth()+1)+"."+p(n.getDate()),time:p(n.getHours())+":"+p(n.getMinutes()),from:v.replace(/-/g,""),end:d.end,link:d.link});renderHist();' +
+  'LOG.unshift({date:n.getFullYear()+"."+p(n.getMonth()+1)+"."+p(n.getDate()),time:p(n.getHours())+":"+p(n.getMinutes()),from:v.replace(/-/g,""),end:d.end,link:d.link,clicks:0});renderHist();' +
   '}).catch(function(){b.disabled=false;b.textContent="링크 생성";alert("오류가 발생했어요");});}' +
   'function cp(){var t=document.getElementById("lnk").innerText;navigator.clipboard.writeText(t).then(showToast);}' +
   '</script></body></html>';
