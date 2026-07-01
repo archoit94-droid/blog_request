@@ -2,14 +2,13 @@
 const { useState: useStateA, useEffect: useEffectA } = React;
 
 // ════════════════════════════════════════════════════════════════
-//  고방 블로그 — 2차 "여름 성수기 특가" 랜딩
+//  고방 블로그 — "U사장님 특가" 랜딩
 //  팔레트: 밝은 중립 베이스 + 틸(U 브랜드) 악센트 + 딥틸 대비 밴드 2곳
-//  기간 06.11~07.13 · 정가 300,000 → 50% → 150,000 (VAT 별도)
+//  상시 판매 · 정가 300,000 → 50% → 150,000 (VAT 별도)
 // ════════════════════════════════════════════════════════════════
 
 const APPLY_URL = 'https://gobangmkt.github.io/blog_request/';
 const ASK_URL   = 'https://u-ceo.channel.io/workflows/828761';
-const PERIOD    = '06.11 ~ 07.13';
 
 // ── SVG 아이콘 ────────────────────────────────────────────────────
 const Ic = {
@@ -55,7 +54,7 @@ function V2Nav() {
         <a href="#top" className="v2-nav-logo">
           <img src="assets/U_ALF.png" alt="고방" />
           <span className="v2-nav-name">고방 블로그</span>
-          <Pill style={{ fontSize: 11, padding: '3px 9px' }}>여름특가</Pill>
+          <Pill style={{ fontSize: 11, padding: '3px 9px' }}>U사장님 특가</Pill>
         </a>
         <a href={APPLY_URL} target="_blank" rel="noopener" className="v2-cta v2-cta-sm">
           15만원 신청 <Ic.arrow style={{ marginLeft: 2 }} />
@@ -145,7 +144,7 @@ function VariantA() {
           </div>
 
           <div className="v2-hero-tags v2-up d1">
-            <span className="v2-tag"><i className="v2-dot" aria-hidden />여름 성수기 특가 · {PERIOD}</span>
+            <span className="v2-tag"><i className="v2-dot" aria-hidden />U사장님 특가</span>
           </div>
 
           <h1 className="v2-h1 v2-up d2">
@@ -236,7 +235,7 @@ function VariantA() {
       <section className="v2-sec v2-dark v2-price-sec" id="price">
         <div className="v2-container">
           <div className="v2-head">
-            <Eyebrow dark>여름 성수기 단 한 번</Eyebrow>
+            <Eyebrow dark>U사장님 전용 특가</Eyebrow>
             <h2 className="v2-h2 v2-on-dark">일반 블로그 마케팅 30만원~,<br />고방은 <span className="v2-acc-d">15만원</span>.</h2>
           </div>
           <div className="v2-price-card">
@@ -245,7 +244,7 @@ function VariantA() {
               <Pill>50% OFF</Pill>
             </div>
             <div className="v2-pc-arrow" aria-hidden>↓</div>
-            <div className="v2-pc-label">여름 특가가</div>
+            <div className="v2-pc-label">U사장님 특가가</div>
             <div className="v2-pc-now"><em className="num">150,000</em><span className="v2-pc-won">원</span></div>
             <div className="v2-pc-vat">VAT 별도 · 1건 기준</div>
             <div className="v2-pc-note">
@@ -304,11 +303,11 @@ function VariantA() {
             <V2Faq q="작성한 블로그는 어디에 노출되나요?"
               a="신청하신 키워드 기준으로 <strong>네이버 블로그탭 상위 진입을 목표</strong>로 작성해요. 네이버 알고리즘 특성상 순위·유지 기간은 변동될 수 있어요." />
             <V2Faq q="고방 광고 6개월 상품 없이도 신청할 수 있나요?"
-              a="네, <strong>이번 여름 특가는 단건 단독 구매</strong>가 가능해요. 6개월 상품 이용 여부와 무관하게 1건만 가볍게 신청할 수 있어요." />
+              a="네, <strong>U사장님 특가는 단건 단독 구매</strong>가 가능해요. 6개월 상품 이용 여부와 무관하게 1건만 가볍게 신청할 수 있어요." />
             <V2Faq q="원하는 키워드로 쓸 수 있나요?"
               a="네, 키워드는 <strong>1~3개 직접 입력</strong>해요. 단, 현재 고방 블로그가 상위노출 중인 키워드에 한하며, 최근 사용된 키워드는 사용이 제한될 수 있어요. 자세한 건 <strong>신청서에서 확인</strong>돼요." />
             <V2Faq q="여러 번 신청할 수 있나요?"
-              a="이벤트 기간 동안 <strong>고방에 등록된 지점당 1회</strong> 신청 가능해요." />
+              a="<strong>고방에 등록된 지점당 1회</strong> 신청 가능해요." />
           </div>
         </div>
       </section>
@@ -316,7 +315,7 @@ function VariantA() {
       {/* ─── FINAL CTA (다크 밴드) ─── */}
       <section className="v2-sec v2-dark v2-final" id="cta">
         <div className="v2-container v2-final-inner">
-          <span className="v2-final-period">{PERIOD} · 기간 한정</span>
+          <span className="v2-final-period">U사장님 특가</span>
           <h2 className="v2-final-h">정가 30만원짜리 포스팅,<br /><span className="v2-acc-d">지금은 15만원</span>이에요.</h2>
           <a href={APPLY_URL} target="_blank" rel="noopener" className="v2-cta v2-cta-lg">
             지금 신청하기 <Ic.arrow style={{ marginLeft: 4 }} />
@@ -333,7 +332,7 @@ function VariantA() {
             <img src="assets/U_ALF.png" alt="고방" />
             <span>고방 · neoflatMKT</span>
           </div>
-          <p>고방 공식 블로그 여름 성수기 특가 페이지 · gobang.kr · u-ceo.kr</p>
+          <p>고방 공식 블로그 U사장님 특가 페이지 · gobang.kr · u-ceo.kr</p>
           <div className="v2-foot-copy">© 2026 neoflatMKT. All rights reserved.</div>
         </div>
       </footer>
