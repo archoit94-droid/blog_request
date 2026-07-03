@@ -516,6 +516,15 @@ function highlightRequestRowByUrl(ss, targetUrl) {
   }
 }
 
+// SOLAPI 스크립트 속성 점검 — 값 노출 없이 존재 여부만 로그 (편집기에서 직접 실행)
+function checkSolapiProps() {
+  var props = PropertiesService.getScriptProperties();
+  ['SOLAPI_API_KEY', 'SOLAPI_API_SECRET', 'SOLAPI_PF_ID'].forEach(function(k) {
+    var v = props.getProperty(k);
+    Logger.log(k + ': ' + (v ? 'OK (길이 ' + v.length + ')' : '없음 — 설정 필요'));
+  });
+}
+
 // 결제 요청 알림톡 발송 기록 — 신청 내역 O열(15) 타임스탬프, 재발송 방지용
 function markPaymentAlimtalkSent_(sheet, row) {
   if (!sheet.getRange(1, 15).getValue()) sheet.getRange(1, 15).setValue('결제요청 발송시간');
