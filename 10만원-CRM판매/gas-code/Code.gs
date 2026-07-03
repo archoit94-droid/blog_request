@@ -437,8 +437,8 @@ function submitForm(formData) {
 
   var sheet = ss.getSheetByName('신청 내역');
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['신청일시', '결제완료일', '신청자', '전화번호', '지점 URL', '키워드1', '키워드2', '키워드3', '강조 내용', '보증금', '월세', '도보정보', '작성 타입', '상태']);
-    sheet.getRange(1, 1, 1, 14).setFontWeight('bold').setBackground('#f0f0f0');
+    sheet.appendRow(['신청일시', '결제완료일', '신청자', '전화번호', '지점 URL', '키워드1', '키워드2', '키워드3', '강조 내용', '보증금', '월세', '도보정보', '작성 타입', '상태', '결제요청 발송시간']);
+    sheet.getRange(1, 1, 1, 15).setFontWeight('bold').setBackground('#f0f0f0');
   }
   var now = new Date();
   sheet.appendRow([now, '', formData.name, formData.phone, formData.placeUrl, formData.keyword1, formData.keyword2 || '', formData.keyword3 || '', formData.description, formData.deposit || '', formData.monthly || '', formData.walking || '', formData.templateType || 'A', '신청완료']);
@@ -451,11 +451,15 @@ function submitForm(formData) {
     doneSheet.getRange(doneSheet.getLastRow(), 8).setValue('발송대기');
   }
 
-  // 결제 요청 알림톡
-  try {
-    sendAlimtalk(formData.phone, TEMPLATE_PAYMENT, { '#{신청자}': formData.name || '' });
-  } catch(alimErr) {
-    Logger.log('결제 요청 알림톡 실패: ' + alimErr);
+  // 결제 요청 알림톡 — 작성 타입 10-A/10-B 건 자동발송
+  var tmplType = String(formData.templateType || '').trim();
+  if (tmplType === '10-A' || tmplType === '10-B') {
+    try {
+      sendAlimtalk(formData.phone, TEMPLATE_PAYMENT, { '#{신청자}': formData.name || '' });
+      markPaymentAlimtalkSent_(sheet, sheet.getLastRow());
+    } catch(alimErr) {
+      Logger.log('결제 요청 알림톡 실패: ' + alimErr);
+    }
   }
 
   // 신청 접수 이메일 알림
@@ -512,6 +516,12 @@ function highlightRequestRowByUrl(ss, targetUrl) {
   }
 }
 
+// 결제 요청 알림톡 발송 기록 — 신청 내역 O열(15) 타임스탬프, 재발송 방지용
+function markPaymentAlimtalkSent_(sheet, row) {
+  if (!sheet.getRange(1, 15).getValue()) sheet.getRange(1, 15).setValue('결제요청 발송시간');
+  sheet.getRange(row, 15).setValue(Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'));
+}
+
 // 알림톡 발송
 function sendAlimtalk(to, templateId, variables) {
   var pfId    = PropertiesService.getScriptProperties().getProperty('SOLAPI_PF_ID');
@@ -556,6 +566,23 @@ function onSheetEdit(e) {
     var paymentDate = e.range.getValue();
     if (!paymentDate) return;
     applyBlogPaymentComplete_(e.source, sheet, row, paymentDate);
+  }
+
+  // 신청 내역 M열(작성 타입) 입력 → 10-A/10-B면 결제 요청 알림톡 자동발송
+  // (폼 제출 건은 submitForm에서 발송·O열 기록 — 여기는 시트 직접 입력 건 커버)
+  if (sheetName === '신청 내역' && col === 13 && row >= 2) {
+    var tmpl = String(e.range.getValue()).trim();
+    if (tmpl !== '10-A' && tmpl !== '10-B') return;
+    if (sheet.getRange(row, 15).getValue()) return; // O열 발송시간 있으면 재발송 방지
+    var reqName  = sheet.getRange(row, 3).getValue();
+    var reqPhone = String(sheet.getRange(row, 4).getValue()).replace(/[^0-9]/g, '');
+    if (!reqPhone) return;
+    try {
+      sendAlimtalk(reqPhone, TEMPLATE_PAYMENT, { '#{신청자}': reqName || '' });
+      markPaymentAlimtalkSent_(sheet, row);
+    } catch(tmplErr) {
+      Logger.log('작성타입 결제요청 알림톡 실패: ' + tmplErr);
+    }
   }
 
   // 완료 내역 H열(발송 드롭박스) → 작업완료 알림톡 발송 + [신청 내역] 주황색 표시
