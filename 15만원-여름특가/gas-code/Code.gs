@@ -222,6 +222,8 @@ function submitForm(formData) {
   }
   var now = new Date();
   sheet.appendRow([now, '', formData.name, formData.phone, formData.placeUrl, formData.keyword1, formData.keyword2 || '', formData.keyword3 || '', formData.description, formData.deposit || '', formData.monthly || '', formData.walking || '', formData.templateType || 'A', '신청완료']);
+  var newRow = sheet.getLastRow();
+  setPriceByType_(sheet, newRow, formData.templateType || 'A'); // P열(16) 단가 자동 기입
 
   var doneSheet = ss.getSheetByName('완료 내역');
   if (doneSheet) {
@@ -234,6 +236,7 @@ function submitForm(formData) {
   // 결제 요청 알림톡
   try {
     sendAlimtalk(formData.phone, TEMPLATE_PAYMENT, { '#{신청자}': formData.name || '' });
+    markPaymentAlimtalkSent_(sheet, newRow); // O열(15) 결제요청 발송시간 기록
   } catch(alimErr) {
     Logger.log('결제 요청 알림톡 실패: ' + alimErr);
   }
@@ -258,6 +261,22 @@ function submitForm(formData) {
   } catch(mailErr) {}
 
   return { success: true };
+}
+
+// P열(16) 단가 — 작성타입 기준. 10-A/10-B(10만원 상품)=110,000, 그 외(A/B, 15만원)=165,000.
+function setPriceByType_(sheet, row, tmplType) {
+  if (!sheet.getRange(1, 16).getValue()) sheet.getRange(1, 16).setValue('단가');
+  var t = String(tmplType || '').trim();
+  var price = (t.indexOf('10-') === 0) ? 110000 : 165000;
+  var cell = sheet.getRange(row, 16);
+  cell.setValue(price);
+  cell.setNumberFormat('₩#,##0');
+}
+
+// O열(15) 결제요청 발송시간 — 재발송 방지·기록용
+function markPaymentAlimtalkSent_(sheet, row) {
+  if (!sheet.getRange(1, 15).getValue()) sheet.getRange(1, 15).setValue('결제요청 발송시간');
+  sheet.getRange(row, 15).setValue(Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'));
 }
 
 // SOLAPI HMAC-SHA256 인증 헤더 생성

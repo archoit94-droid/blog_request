@@ -442,6 +442,8 @@ function submitForm(formData) {
   }
   var now = new Date();
   sheet.appendRow([now, '', formData.name, formData.phone, formData.placeUrl, formData.keyword1, formData.keyword2 || '', formData.keyword3 || '', formData.description, formData.deposit || '', formData.monthly || '', formData.walking || '', formData.templateType || 'A', '신청완료']);
+  var newRow = sheet.getLastRow();
+  setPriceByType_(sheet, newRow, formData.templateType || ''); // P열(16) 단가 자동 기입
 
   var doneSheet = ss.getSheetByName('완료 내역');
   if (doneSheet) {
@@ -456,7 +458,7 @@ function submitForm(formData) {
   if (tmplType === '10-A' || tmplType === '10-B') {
     try {
       sendAlimtalk(formData.phone, TEMPLATE_PAYMENT, { '#{신청자}': formData.name || '' });
-      markPaymentAlimtalkSent_(sheet, sheet.getLastRow());
+      markPaymentAlimtalkSent_(sheet, newRow);
     } catch(alimErr) {
       Logger.log('결제 요청 알림톡 실패: ' + alimErr);
     }
@@ -523,6 +525,16 @@ function checkSolapiProps() {
     var v = props.getProperty(k);
     Logger.log(k + ': ' + (v ? 'OK (길이 ' + v.length + ')' : '없음 — 설정 필요'));
   });
+}
+
+// P열(16) 단가 — 작성타입 기준. 10-A/10-B(10만원 상품)=110,000, 그 외(A/B, 15만원)=165,000.
+function setPriceByType_(sheet, row, tmplType) {
+  if (!sheet.getRange(1, 16).getValue()) sheet.getRange(1, 16).setValue('단가');
+  var t = String(tmplType || '').trim();
+  var price = (t.indexOf('10-') === 0) ? 110000 : 165000;
+  var cell = sheet.getRange(row, 16);
+  cell.setValue(price);
+  cell.setNumberFormat('₩#,##0');
 }
 
 // 결제 요청 알림톡 발송 기록 — 신청 내역 O열(15) 타임스탬프, 재발송 방지용
