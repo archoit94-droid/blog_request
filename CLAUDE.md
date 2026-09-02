@@ -108,6 +108,15 @@ gas-code/Code.gs    Google Apps Script 서버 코드
 - `fixCompletedRows()` — E+F+G 채워진 행 일괄 발송완료 처리
 - `cleanupH_Column()` — FALSE 잔재 값 → 발송대기로 정리
 
+### 2.5. 신청 내역 행 배경색 + N일 미결제 리마인드 (10만원 폼, 2026-09-01 추가)
+- **행 배경색**: 결제완료일(B열) 입력 시 노랑(`#FFE599`), 비우면 흰색 복귀. `onSheetEdit`(시트 직접 입력)·`setPaymentDate`(CS도움앱 인박스) 양쪽 공통 — 빌리투어 릴스단건과 동일 규칙.
+- **N일 미결제 리마인드 알림톡**: 신청일시(A) 기준 **5일**(설정 시트 7행 B열, 기본값 `PAYMENT_REMINDER_DAYS_DEFAULT`) 경과 + 결제완료일(B) 미기입 건에 리마인드 알림톡 **1회만** 발송. 재발송 없음(결제 안 해도 계속 안 보냄).
+  - 템플릿: `TEMPLATE_PAYMENT_REMINDER`(`KA01TP260901073452005bOqBuFdkD3k`) — **변수 없는 고정문구 템플릿**, `sendAlimtalk` 호출 시 변수 `{}`
+  - 발송 기록: 신청 내역 **Q열(17) "리마인드 발송시간"** — 재발송 방지 가드
+  - 매일 오전 10시 자동 실행 시간 기반 트리거 `remindUnpaidApplications`. 설치: Apps Script 편집기에서 `setupPaymentReminderTrigger()` 최초 1회 수동 실행(설정 시트 7행 라벨/기본값도 함께 생성됨).
+  - 기준 일수 변경: 설정 시트 7행 B열 숫자만 수정(코드 재배포 불필요)
+  - 기존 데이터 소급 색칠: `recolorApplySheet()` 수동 1회 실행 — **완료 내역 발송완료(주황) > 결제완료일(노랑) > 흰색** 우선순위로 칠함(이미 작성완료 표시된 행을 노랑으로 덮어쓰지 않음)
+
 ### 3. submitForm → 완료 내역 기록 규칙
 - 신청 접수 시 완료 내역에 `['', name, phone, placeUrl, '', '', '', '발송대기', '']` 형태로 추가
 - B(신청자), C(전화번호), D(지점URL)는 신청 시 자동 기록

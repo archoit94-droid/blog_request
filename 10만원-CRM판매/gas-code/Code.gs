@@ -1,8 +1,15 @@
 var SPREADSHEET_ID    = '1lgAsrtoeqv1-g3Nh3D21zTyuGLdAZuP5jSXxftlIxh0';
 var TEMPLATE_PAYMENT  = 'KA01TP2607010421382240hu64yZfcMe';
 var TEMPLATE_COMPLETE = 'KA01TP2605150533203936iNKdKqNSyV';
+var TEMPLATE_PAYMENT_REMINDER = 'KA01TP260901073452005bOqBuFdkD3k'; // 결제완료 요청 리마인드 — 결제완료일 미기입 N일 경과 시 발송
 var FORM_BASE_URL     = 'https://gobangmkt.github.io/blog_request/10만원-CRM판매/';
 var LINK_TTL_DAYS     = 5; // 발급일 + 5일이 개인별 마감
+var PAYMENT_REMINDER_DAYS_DEFAULT = 5; // 설정 시트 7행에 값 있으면 그걸 우선(getReminderDays_)
+
+// 신청 내역 행 배경색 — 빌리투어 릴스단건과 동일 규칙(결제완료일 있으면 노랑, 작성완료는 주황)
+var ROW_BG_PAID = '#FFE599';
+var ROW_BG_NONE = '#FFFFFF';
+var ROW_BG_DONE = '#ff9900'; // 완료 내역 발송완료 → highlightRequestRowByUrl과 동일 색
 
 // ── 서명 링크 (URL 위조 방지) ───────────────────────────────────────
 // 비밀키는 스크립트 속성에 1회 자동 생성·보관 → 코드/깃에 노출되지 않음.
@@ -512,7 +519,7 @@ function highlightRequestRowByUrl(ss, targetUrl) {
     var rowUrl = String(data[i][0]).trim().toLowerCase();
     if (rowUrl === normalizedTarget) {
       var range = requestSheet.getRange(i + 2, 1, 1, requestSheet.getLastColumn());
-      range.setBackground('#ff9900');
+      range.setBackground(ROW_BG_DONE);
       return;
     }
   }
@@ -541,6 +548,86 @@ function setPriceByType_(sheet, row, tmplType) {
 function markPaymentAlimtalkSent_(sheet, row) {
   if (!sheet.getRange(1, 15).getValue()) sheet.getRange(1, 15).setValue('결제요청 발송시간');
   sheet.getRange(row, 15).setValue(Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'));
+}
+
+// 결제완료 리마인드 알림톡 발송 기록 — 신청 내역 Q열(17) 타임스탬프, 재발송(1회 한정) 방지용
+function markPaymentReminderSent_(sheet, row) {
+  if (!sheet.getRange(1, 17).getValue()) sheet.getRange(1, 17).setValue('리마인드 발송시간');
+  sheet.getRange(row, 17).setValue(Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'));
+}
+
+// 리마인드 기준 일수 — 설정 시트 7행(B열)에 값 있으면 그 값, 없으면 기본값
+function getReminderDays_() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var s = ss.getSheetByName('설정');
+  var v = s.getRange(7, 2).getValue();
+  var n = parseInt(v, 10);
+  return (isNaN(n) || n <= 0) ? PAYMENT_REMINDER_DAYS_DEFAULT : n;
+}
+
+/* 신청 내역: 신청일시(A) 기준 N일(getReminderDays_) 경과 + 결제완료일(B) 미기입 건에
+   결제완료 요청 리마인드 알림톡 1회 발송. Q열(17) 발송시간으로 재발송 방지.
+   매일 실행되는 시간 기반 트리거(setupPaymentReminderTrigger)로 호출됨. */
+function remindUnpaidApplications() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName('신청 내역');
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return 0;
+
+  var reminderDays = getReminderDays_();
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  var data = sheet.getRange(2, 1, lastRow - 1, 17).getValues();
+  var sent = 0;
+  for (var i = 0; i < data.length; i++) {
+    var row       = i + 2;
+    var applyDate = data[i][0];   // A: 신청일시
+    var paidDate  = data[i][1];   // B: 결제완료일
+    var name      = String(data[i][2] || '').trim();               // C: 신청자
+    var phone     = String(data[i][3] || '').replace(/[^0-9]/g, ''); // D: 전화번호
+    var reminded  = data[i][16];  // Q(17): 리마인드 발송시간
+
+    if (!applyDate || paidDate || reminded || !phone) continue;
+
+    var d = new Date(applyDate);
+    d.setHours(0, 0, 0, 0);
+    var diffDays = Math.floor((today - d) / 86400000);
+    if (diffDays < reminderDays) continue;
+
+    try {
+      sendAlimtalk(phone, TEMPLATE_PAYMENT_REMINDER, {});  // 템플릿에 변수 없음 — 고정문구
+      markPaymentReminderSent_(sheet, row);
+      sent++;
+    } catch (err) {
+      Logger.log('결제완료 리마인드 알림톡 실패 (행 ' + row + '): ' + err);
+    }
+  }
+  Logger.log('remindUnpaidApplications 완료: ' + sent + '건 발송 (기준 ' + reminderDays + '일)');
+  return sent;
+}
+
+// 설정 시트 7행에 리마인드 기준일수 라벨/기본값 없으면 채움 — 시트에서 직접 N 조정 가능해짐
+function ensureReminderConfigRow_() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var s = ss.getSheetByName('설정');
+  if (!s.getRange(7, 1).getValue()) {
+    s.getRange(7, 1, 1, 2).setValues([['결제완료 리마인드 기준일수', PAYMENT_REMINDER_DAYS_DEFAULT]]);
+    s.getRange(7, 1).setFontWeight('bold');
+  }
+}
+
+// 리마인드 시간 기반 트리거 등록 — 최초 1회 수동 실행 (매일 오전 10시)
+function setupPaymentReminderTrigger() {
+  ensureReminderConfigRow_();
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'remindUnpaidApplications') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('remindUnpaidApplications')
+    .timeBased()
+    .everyDays(1)
+    .atHour(10)
+    .create();
 }
 
 // 알림톡 발송
@@ -585,6 +672,8 @@ function onSheetEdit(e) {
   // (CS앱 setPaymentDate와 공용 — applyBlogPaymentComplete_)
   if (sheetName === '신청 내역' && col === 2 && row >= 2) {
     var paymentDate = e.range.getValue();
+    // 행 배경: 결제완료일 있으면 노랑, 비우면 흰색 복귀
+    sheet.getRange(row, 1, 1, sheet.getLastColumn()).setBackground(paymentDate ? ROW_BG_PAID : ROW_BG_NONE);
     if (!paymentDate) return;
     applyBlogPaymentComplete_(e.source, sheet, row, paymentDate);
   }
@@ -649,6 +738,44 @@ function onSheetEdit(e) {
 function testAuth() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   Logger.log(ss.getName());
+}
+
+// 신청 내역 기존 행 색 소급 적용 (수동 1회 실행)
+// 우선순위: 완료내역 발송완료(주황, highlightRequestRowByUrl과 동일 판정) > 결제완료일(노랑) > 흰색
+// ⚠️ 이 우선순위가 없으면 이미 작성완료(주황) 표시된 행이 노랑/흰색으로 덮어써진다.
+function recolorApplySheet() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName('신청 내역');
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return;
+
+  var totalCol = sheet.getLastColumn();
+  var data = sheet.getRange(2, 1, lastRow - 1, totalCol).getValues();
+
+  // 완료 내역: 발송완료(H열, idx7)된 행의 지점 URL(D열, idx3) 집합
+  var doneUrls = {};
+  var doneSheet = ss.getSheetByName('완료 내역');
+  if (doneSheet) {
+    var doneLast = doneSheet.getLastRow();
+    if (doneLast >= 2) {
+      var doneData = doneSheet.getRange(2, 1, doneLast - 1, 8).getValues();
+      for (var j = 0; j < doneData.length; j++) {
+        if (String(doneData[j][7] || '').trim() === '발송완료') {
+          doneUrls[String(doneData[j][3] || '').trim().toLowerCase()] = true;
+        }
+      }
+    }
+  }
+
+  for (var i = 0; i < data.length; i++) {
+    var placeUrl = String(data[i][4] || '').trim().toLowerCase(); // E: 지점 URL
+    var bg;
+    if (placeUrl && doneUrls[placeUrl]) bg = ROW_BG_DONE;   // 작성완료(주황) 우선
+    else if (data[i][1])                bg = ROW_BG_PAID;   // B: 결제완료일(노랑)
+    else                                 bg = ROW_BG_NONE;
+    sheet.getRange(i + 2, 1, 1, totalCol).setBackground(bg);
+  }
+  Logger.log('신청 내역 행 색 일괄 정리 완료 (주황=작성완료 우선)');
 }
 
 // 마이그레이션: H열(true/false) → "발송대기"/"발송완료"로 변환
@@ -843,10 +970,12 @@ function setPaymentDate(token, row, date) {
 
   if (!date) {
     sheet.getRange(row, 2).clearContent(); // 취소(clear) — 후속 알림 없음
+    sheet.getRange(row, 1, 1, sheet.getLastColumn()).setBackground(ROW_BG_NONE);
     return { ok: true };
   }
   var d = new Date(date); // 'yyyy-MM-dd'
   sheet.getRange(row, 2).setValue(d);
+  sheet.getRange(row, 1, 1, sheet.getLastColumn()).setBackground(ROW_BG_PAID);
   try {
     applyBlogPaymentComplete_(ss, sheet, row, d);
   } catch (e) {
